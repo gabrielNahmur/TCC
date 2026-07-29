@@ -1,0 +1,80 @@
+\section{Implementação}
+\label{sec:implementacao}
+
+Esta seção registra o estado observado no repositório em 29 de julho de 2026,
+sem apresentar componentes inexistentes como concluídos. O repositório está
+dividido em artigo, pesquisa e protótipo. No protótipo, o backend concentra
+regras e casos de uso; a PWA consome a API ou executa um modo demonstrativo
+sintético; e integrações externas respeitam as interfaces
+\path{VehicleDataProvider} e \path{DispenserGateway}.
+
+O backend FastAPI já recebe casos sintéticos, normaliza combustíveis, avalia a
+compatibilidade, registra decisões e eventos minimizados em SQLite e aciona um
+dispensador em memória. Antes de \path{UNLOCK}, a intenção
+\path{PENDING_DEVICE} e o identificador do comando são persistidos; o ACK
+síncrono do gateway simulado promove o estado para \path{AUTHORIZED}. Na
+conclusão ou expiração, o backend tenta \path{LOCK_ALL}; se essa confirmação
+falhar, o TTL local limita a liberação residual. O override é limitado a motivos
+específicos de \path{REVIEW_REQUIRED}; \path{DENIED}, falha do dispositivo e
+estado expirado não podem ser reativados. A proteção atual usa token Bearer
+compartilhado, não autenticação individual.
+
+O backend persiste \path{client_request_id} e um fingerprint HMAC da solicitação
+para que uma reconciliação não provoque novo acionamento. Também mantém, somente
+em memória e por TTL, um cache indexado por HMAC da placa para reutilizar a
+consulta de compatibilidade no percurso PWA--autorização. O segredo HMAC é
+configuração externa ao repositório. O MVP aceita, por padrão, apenas origens do
+próprio computador; essa restrição e o token global não substituem autenticação
+individual, RBAC, TLS ou gestão de sessão.
+
+A PWA em React implementa os fluxos de placa, seleção, decisão, contagem de TTL,
+conclusão, revisão de supervisor e reconciliação manual após resposta perdida,
+sem repetir automaticamente comandos cujo efeito físico seja desconhecido. O
+firmware experimental contém contrato MQTT,
+cinco saídas distintas, sessão de inicialização, sequência monotônica persistida,
+TTL local, rejeição de duplicatas e lógica desenergizada-igual-a-bloqueada.
+Entretanto, o backend ainda utiliza apenas o gateway em memória: não há
+integração MQTT ponta a ponta, placa ESP32 programada ou atuador físico ensaiado.
+O modo SENATRAN é deliberadamente recusado na inicialização e não realiza
+chamada externa.
+
+\begingroup
+\renewcommand{\arraystretch}{1.04}
+\begin{table}[H]
+  \centering
+  \caption{Estado dos incrementos de implementação}
+  \label{tab:implementacao-status}
+  \footnotesize
+  \begin{tabularx}{\textwidth}{@{}L{2.8cm}YL{3.2cm}@{}}
+    \toprule
+    \textbf{Incremento} & \textbf{Critério de conclusão} & \textbf{Estado nesta versão} \\
+    \midrule
+    Domínio e simuladores & Decisões reproduzíveis e bloqueio após término, expiração ou falha & Implementado no backend simulado \\
+    API e persistência & Contratos, idempotência, auditoria minimizada e testes automatizados & FastAPI e SQLite implementados \\
+    PWA e autenticação & Fluxos de frentista e supervisor utilizáveis em tablet & PWA implementada; autenticação individual pendente \\
+    MQTT e bancada & Comandos idempotentes, TTL local e ciclos físicos repetidos & Firmware parcial; integração e bancada pendentes \\
+    SENATRAN homologada & Caso de uso aprovado, contratos e certificados fora do repositório & Autorização pendente \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+\endgroup
+
+Na verificação local desta versão, \texttt{pytest} executou 82 testes do backend,
+todos aprovados, com 93\% de cobertura de instruções. Na PWA, os 12 testes
+automatizados foram aprovados e a compilação de produção terminou sem erro. A
+lógica C++ portátil de intertravamento também compilou com avisos tratados como
+erro e concluiu seu conjunto de asserções. A compilação PlatformIO para o alvo
+\path{esp32dev} terminou sem erro; a gravação e execução em uma placa, a
+integração entre componentes e os ciclos físicos não foram executados. Esses
+resultados verificam incrementos de software, mas não equivalem à matriz integral
+de aceitação de H1.
+
+\pendente{concluir autenticação individual e RBAC, implementar o gateway MQTT no
+backend, gravar e ensaiar o firmware em hardware aprovado pelo orientador e
+obter autorização externa antes da integração SENATRAN.}
+
+As tecnologias efetivamente usadas nesta etapa são FastAPI/Python, React/PWA,
+SQLite e C++ para ESP32. MQTT está implementado apenas no lado experimental do
+firmware. PostgreSQL e Docker permanecem possibilidades futuras. Qualquer ajuste
+deverá preservar interfaces, estados seguros e testes de aceitação.

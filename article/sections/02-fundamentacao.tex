@@ -1,0 +1,85 @@
+\section{Fundamentação teórica}
+\label{sec:fundamentacao}
+
+\subsection{Erro humano e barreiras de prevenção}
+
+\cite{reason1990} diferencia formas de falha associadas à execução e ao
+planejamento e mostra que o desempenho humano é influenciado pelo sistema em
+que a tarefa ocorre. Essa perspectiva evita reduzir o problema a uma culpa
+individual e direciona a análise para sinais, sequência da tarefa, interface,
+equipamento e condições de trabalho. No abastecimento, \cite{adamsDavid2007}
+aplicaram análise hierárquica da tarefa e encontraram fatores físicos e
+psicológicos que, isolados ou combinados, abrem caminhos para a seleção errada.
+
+O intertravamento proposto é uma barreira de prevenção: a ação física depende de
+uma autorização calculada antes da retirada ou do uso do bico. Isso não elimina
+treinamento, conferência e procedimentos. Também pode criar novos modos de
+falha, como indisponibilidade do serviço, código veicular não reconhecido,
+comando atrasado ou uso abusivo de uma exceção. Por isso, o projeto adota os
+princípios de autorização explícita, menor privilégio e padrão seguro diante de
+falhas, coerentes com princípios clássicos de proteção de sistemas
+\cite{saltzerSchroeder1975}.
+
+\subsection{Consulta veicular e política de compatibilidade}
+
+O serviço Consulta Online SENATRAN expõe operações de consulta a bases mantidas pela
+Secretaria Nacional de Trânsito. No inventário público, os campos ``Código
+Combustível'' e ``Combustível Descrição'' aparecem na consulta detalhada de
+veículo \cite{serproDadosVeiculo2026}. O retorno do provedor, contudo, não deve
+acionar diretamente um dispositivo. Entre a consulta e o atuador haverá uma
+camada de política que:
+
+\begin{enumerate}
+  \item valida formato, atualidade e completude da resposta;
+  \item converte códigos externos para categorias internas versionadas;
+  \item representa veículos com um ou mais combustíveis admitidos;
+  \item compara o produto solicitado à lista de compatibilidade; e
+  \item produz uma decisão auditável: autorizado, negado ou revisão necessária.
+\end{enumerate}
+
+Essa separação permite substituir o provedor real por dados sintéticos durante
+o desenvolvimento e testar códigos novos sem expor dados pessoais. Também evita
+acoplar a segurança física a detalhes instáveis da API.
+
+\subsection{Sistemas ciberfísicos, mensageria e estado seguro}
+
+O protótipo combina software de negócio, comunicação e atuadores; portanto, uma
+decisão digital produz efeito físico observável. A comunicação entre o backend
+e o controlador será representada por mensagens MQTT, protocolo padronizado pela
+OASIS com níveis de qualidade de serviço e sessões próprias
+\cite{oasisMqtt2019}. Esses recursos não garantem, sozinhos, que um comando seja
+executado uma única vez. O projeto acrescenta identificador idempotente,
+validade temporal, confirmação e bloqueio local por expiração.
+
+O estado seguro do protótipo é todos os bicos bloqueados. Inicialização, perda
+de conexão, resposta ambígua, comando vencido e término da sessão conduzem a
+esse estado. Uma liberação excepcional não altera essa premissa: ela exige
+supervisor autenticado, justificativa e trilha de auditoria.
+
+\subsection{Proteção de dados e acesso regulado}
+
+A placa pode viabilizar associação a uma pessoa natural no contexto do
+tratamento e, por prudência, será tratada como dado pessoal. A Lei Geral de
+Proteção de Dados Pessoais estabelece, entre outros, os princípios de finalidade,
+adequação, necessidade, segurança, prevenção e responsabilização
+\cite{lgpd2018}. A Portaria SENATRAN n\textsuperscript{o} 139/2025 disciplina o acesso aos sistemas
+e subsistemas, incluindo avaliação do caso de uso, controles de segurança e
+atuação do Serpro e de uma GCC \cite{senatran1392025}.
+
+Consequentemente, a versão de bancada utiliza placas e respostas sintéticas.
+Na integração autorizada, a placa será usada apenas durante a decisão e não
+constará do log padrão. Também não serão persistidos resposta bruta, nome de
+proprietário, Renavam ou chassi. A base legal, os avisos ao titular, a retenção e
+as responsabilidades deverão refletir o caso de uso efetivamente aprovado, não
+uma suposição do projeto.
+
+\subsection{Segurança da instalação}
+
+A NR-20 define requisitos de segurança e saúde no trabalho com inflamáveis e
+combustíveis e contempla o conceito de área classificada \cite{nr20}. A Portaria
+Inmetro n\textsuperscript{o} 115/2022 trata da avaliação da conformidade de equipamentos elétricos
+para atmosferas explosivas \cite{inmetro1152022}. Assim, ESP32, servo, solenoide
+e tablet comuns não serão instalados na zona de abastecimento. O ensaio acadêmico
+ocorrerá sem líquido inflamável, e uma eventual evolução de campo dependerá de
+projeto específico, fabricante da bomba, integrador habilitado e equipamentos
+certificados para a classificação do local.

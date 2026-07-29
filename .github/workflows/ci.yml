@@ -1,0 +1,61 @@
+name: verificacao
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Instalar backend
+        run: python -m pip install -e './prototype/backend[dev]'
+      - name: Testar backend
+        working-directory: prototype/backend
+        run: python -m pytest --cov=app --cov-fail-under=85
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prototype/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: prototype/frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Testar logica fail-closed no host
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror \
+            -Iprototype/firmware/include \
+            prototype/firmware/test_host/interlock_logic_test.cpp \
+            -o /tmp/interlock_logic_test
+          /tmp/interlock_logic_test
+      - name: Compilar firmware ESP32
+        run: |
+          python -m pip install 'platformio==6.1.18'
+          platformio run --project-dir prototype/firmware

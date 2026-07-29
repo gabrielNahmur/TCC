@@ -1,0 +1,102 @@
+\section{Introdução}
+\label{sec:introducao}
+
+O abastecimento é uma atividade cotidiana, mas envolve uma decisão que precisa
+ser correta antes do início da transferência do combustível: associar o produto
+selecionado à configuração admitida pelo veículo. Quando essa associação falha,
+o procedimento posterior depende do tipo e da quantidade de combustível, do
+funcionamento do motor e das recomendações do fabricante. A literatura registra
+que o erro não pode ser explicado apenas por falta de atenção. Em uma análise
+de tarefa e entrevistas com 23 pessoas que haviam abastecido veículos leves com
+o produto errado no Reino Unido, \cite{adamsDavid2007} identificaram combinações
+de fatores humanos e ambientais capazes de formar caminhos para o erro. Os
+autores defenderam intervenções no leiaute e no equipamento para interromper
+esses caminhos.
+
+O presente trabalho nasce de um problema relatado em uma rede de postos de
+combustíveis do sul do Brasil: durante o atendimento, pode ocorrer a seleção de
+um produto incompatível com o veículo. A existência, frequência e composição
+dos custos locais ainda serão verificadas por registros administrativos; por
+isso, esta versão não apresenta número de ocorrências nem valor de prejuízo.
+Essa separação é importante, pois dados internacionais ou relatos isolados não
+podem ser convertidos diretamente em prevalência para a organização estudada.
+
+Como possível barreira anterior à liberação, propõe-se consultar a placa do
+veículo em um serviço autorizado, transformar o código retornado em uma política
+explícita de compatibilidade e liberar temporariamente apenas o bico solicitado
+e compatível. O serviço Consulta Online SENATRAN disponibiliza código e descrição
+do combustível na modalidade detalhada \cite{serproDadosVeiculo2026}. Entretanto,
+seu uso não se resume a uma chamada técnica: requer caso de uso aprovado,
+contratação do Serpro e de uma Gerenciadora de Consentimento e Ciência (GCC) e
+atendimento às condições de governança aplicáveis \cite{senatran1392025,serproComoContratar2026}.
+
+O artefato acadêmico será inicialmente construído em bancada seca, sem
+combustível e em baixa tensão. A trava física representa o intertravamento, mas
+não constitui solução pronta para instalação em uma bomba. Uma implantação real
+exigiria integração com o fabricante ou controlador de pista, classificação do
+local e equipamentos adequados à atmosfera potencialmente explosiva
+\cite{inmetro1152022,nr20}.
+
+\subsection{Problema e pergunta de pesquisa}
+
+O problema de pesquisa consiste na ausência de uma barreira automatizada que,
+no contexto estudado, verifique a compatibilidade antes de autorizar o acesso ao
+bico. A investigação é orientada pela seguinte pergunta:
+
+\begin{quote}
+\textit{Como um sistema baseado em consulta veicular e intertravamento pode
+impedir a liberação de combustíveis incompatíveis em ambiente controlado, e em
+quais condições sua adoção apresenta viabilidade econômica para uma rede de
+postos?}
+\end{quote}
+
+Foram formuladas duas hipóteses verificáveis:
+
+\begin{itemize}
+  \item \textbf{H1:} na matriz de testes de bancada, o sistema impedirá todas as
+  liberações incompatíveis e não liberará automaticamente nenhum bico diante de
+  resposta inválida, ambígua ou indisponível;
+  \item \textbf{H2:} em pelo menos um dos cenários de sensibilidade, as perdas
+  evitáveis estimadas superarão o custo anualizado da solução.
+\end{itemize}
+
+H1 somente será aceita se não houver liberação indevida nos casos definidos
+antes dos ensaios. H2 será avaliada por cenários, e não como economia observada.
+Ambas permanecem sem teste conclusivo nesta etapa.
+
+\subsection{Objetivos}
+
+O objetivo geral é projetar, implementar e avaliar um protótipo para prevenção
+de abastecimento incompatível, integrando consulta veicular, controle de
+autorização e análise econômica baseada em dados históricos anonimizados.
+
+São objetivos específicos:
+
+\begin{enumerate}
+  \item caracterizar o processo de abastecimento e, quando existirem registros
+  suficientes, as ocorrências e os custos documentados no estudo de caso;
+  \item mapear evidências científicas e documentação técnica sobre erro de
+  abastecimento, fatores humanos, identificação veicular e intertravamento;
+  \item elicitar requisitos funcionais, não funcionais, de privacidade e de
+  segurança para o artefato;
+  \item desenvolver um simulador do provedor veicular e um protótipo em bancada
+  com política de falha para o estado bloqueado;
+  \item avaliar o comportamento funcional, o tratamento de falhas, a latência,
+  a usabilidade e a repetibilidade do protótipo; e
+  \item estimar custos e ponto de equilíbrio sob diferentes percentuais de
+  prevenção, distinguindo gastos comprovados de premissas.
+\end{enumerate}
+
+\subsection{Justificativa e contribuições esperadas}
+
+A relevância prática decorre do potencial de agir antes do dano, quando a
+escolha ainda pode ser bloqueada. A relevância acadêmica está na construção e
+avaliação explícita de um artefato sociotécnico: não basta reconhecer a placa;
+é necessário tratar códigos desconhecidos, indisponibilidade, exceções
+operacionais, dados pessoais e o limite entre protótipo e equipamento de campo.
+
+As contribuições esperadas são: (i) uma caracterização documentada do problema
+na empresa; (ii) um protocolo e uma síntese da literatura; (iii) requisitos e
+arquitetura auditáveis; (iv) um protótipo reprodutível de bancada; (v) uma matriz
+de testes com estados de falha; e (vi) um modelo econômico transparente. Essas
+contribuições são metas do trabalho e não resultados já alcançados.

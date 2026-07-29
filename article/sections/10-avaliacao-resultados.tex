@@ -1,0 +1,101 @@
+\section{Avaliação e resultados parciais}
+\label{sec:resultados}
+
+\subsection{Resultados parciais já obtidos}
+
+A análise documental preliminar produziu quatro resultados verificáveis:
+
+\begin{sloppypar}
+\begin{enumerate}
+  \item o inventário público do Serpro classifica código e descrição do
+  combustível como dados da consulta detalhada de veículo
+  \cite{serproDadosVeiculo2026};
+  \item a Portaria n\textsuperscript{o} 139/2025 disciplina o acesso aos sistemas e subsistemas
+  \cite{senatran1392025}. O fluxo público do Serpro prevê solicitação no
+  Credencia, análise da SENATRAN e, após deferimento, contratos com Serpro e GCC
+  \cite{serproComoContratar2026};
+  \item na Portaria SENATRAN n\textsuperscript{o} 417/2026, a faixa de até 50.000 consultas tem
+  valor de R\$~1{,}62 para a modalidade detalhada; R\$~0{,}80 aparece nessa
+  modalidade somente na faixa de 2.000.001 a 2.500.000 consultas
+  \cite{senatran4172026}; e
+  \item os requisitos de segurança para atmosferas explosivas impedem tratar
+  componentes eletrônicos comuns da bancada como solução instalável na pista
+  \cite{inmetro1152022,nr20}.
+\end{enumerate}
+\end{sloppypar}
+
+O valor de R\$~1{,}62 é referência pública na data-base de 29 de julho de 2026,
+não uma cotação contratual completa. Remuneração da GCC, tributos, infraestrutura,
+integração e suporte serão separados na análise econômica. Todos os valores e
+normas serão revalidados na data da entrega.
+
+A partir dessas evidências foram elaborados os requisitos das
+Tabelas~\ref{tab:rf} e~\ref{tab:rnf}, a arquitetura da
+Figura~\ref{fig:arquitetura}, a máquina de estados da Figura~\ref{fig:estados} e
+a política da Tabela~\ref{tab:decisao}. Esses elementos são \textbf{artefatos de
+projeto preliminares}; ainda não constituem resultado experimental.
+
+Também foi produzido um primeiro incremento do artefato. O backend simulado
+implementa consulta de casos sintéticos, mapeamento de combustíveis, decisão,
+TTL, intenção persistida antes do comando, ACK síncrono do dispensador em
+memória, SQLite minimizado e override restrito a incertezas de
+\path{REVIEW_REQUIRED}. A idempotência por \path{client_request_id}, o
+fingerprint HMAC persistido e o cache HMAC temporário evitam, nos casos cobertos,
+novo comando ou segunda consulta durante a reconciliação. A PWA implementa o
+fluxo operacional em modo demonstrativo ou conectado à API e trata resposta
+perdida como estado desconhecido até reconciliação manual. O firmware
+experimental implementa a lógica local de TTL, sequência e idempotência.
+
+Em execução local de 29 de julho de 2026, os 82 testes automatizados do backend
+foram aprovados e a ferramenta de cobertura reportou 93\% das instruções. Os
+12 testes da PWA também foram aprovados, sua compilação de produção foi
+concluída, o executável de teste da lógica C++ do firmware terminou sem falha e
+o alvo \path{esp32dev} foi compilado com PlatformIO.
+Esse resultado é reprodutível pelos comandos documentados no repositório, mas
+se limita a componentes de software. Não houve teste ponta a ponta entre PWA,
+backend, broker e ESP32, gravação/execução em placa nem ensaio com bancada física.
+
+\subsection{Resultados ainda não disponíveis}
+
+\begin{table}[H]
+  \centering
+  \caption{Evidências necessárias para testar as hipóteses}
+  \label{tab:resultados-pendentes}
+  \small
+  \begin{tabularx}{\textwidth}{@{}L{3.2cm}YL{2.5cm}@{}}
+    \toprule
+    \textbf{Evidência} & \textbf{Uso} & \textbf{Estado} \\
+    \midrule
+    Ocorrências e custos anonimizados & Caracterizar o caso e alimentar $L$ & Não coletada \\
+    Total de abastecimentos compatível & Calcular taxa, se houver cobertura equivalente & Não coletado \\
+    Entrevistas autorizadas & Refinar processo, requisitos e modos de falha & Não realizadas \\
+    Matriz integral de H1 & Testar decisões, falhas e bloqueio em todos os casos predefinidos & Parcial: testes de componentes \\
+    Integração MQTT/ESP32 & Confirmar comando, sessão, TTL e retorno ao bloqueio & Não executada \\
+    Ciclos da bancada & Testar repetibilidade e intertravamento físico & Não executados \\
+    Medidas de latência/usabilidade & Avaliar desempenho e interação & Não coletadas \\
+    Custos da solução & Calcular $C_{\mathrm{sol}}$ & Incompletos \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+
+Assim, os testes existentes são evidência preliminar de construção, mas H1 e H2
+permanecem sem teste conclusivo. Esta versão não afirma redução de incidentes,
+retorno financeiro ou adequação para operação real.
+
+\subsection{Critérios de aceitação}
+
+H1 exigirá zero liberação incompatível em todos os casos predefinidos, zero
+liberação automática diante de resposta inválida, ambígua ou indisponível e
+retorno ao bloqueio após expiração, término ou falha. Serão incluídos gasolina,
+etanol, flex, diesel S10, diesel S500, diesel sem especificação inequívoca,
+híbrido, elétrico, conversão não comprovada, veículo não encontrado e provedor
+indisponível. A quantidade de repetições será definida com
+o orientador antes dos ensaios e não será escolhida depois de observar os
+resultados.
+
+H2 será avaliada nos cenários de 25\%, 50\%, 75\% e 100\% de prevenção. A
+hipótese será suportada se $B(p)>0$ em pelo menos um cenário, desde que $L$ e
+$C_{\mathrm{sol}}$ tenham dados adequados. Caso os registros sejam insuficientes, a
+análise será apresentada como exercício de sensibilidade e H2 ficará
+inconclusiva, não rejeitada por conveniência.

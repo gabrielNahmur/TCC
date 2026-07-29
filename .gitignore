@@ -1,0 +1,73 @@
+# Segredos e configuracao local
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+secrets/
+credentials/
+
+# Dados de pesquisa e pessoais
+data/raw/
+data/processed/
+research/data/raw/
+research/data/processed/
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+/data/
+prototype/backend/data/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+coverage/
+.vite/
+
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.run.xml
+*.bcf
+
+# PlatformIO
+.pio/
+
+# Sistema/IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Temporarios de validacao
+tmp/
+outputs/
+*.inspect.ndjson
+presentation/.tmp-artifact/
+presentation/seminario-andamento/
+presentation/*-montage.png

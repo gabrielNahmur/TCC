@@ -1,0 +1,29 @@
+id,categoria,retorno_veicular,combustivel_solicitado,estado_esperado,comando_esperado,criterio
+T001,compativel,gasolina,gasolina,AUTHORIZED,UNLOCK_GASOLINA,liberar somente gasolina
+T002,incompativel,gasolina,diesel_s10,DENIED,LOCK_ALL,nunca liberar diesel
+T003,compativel,diesel,diesel_s10,AUTHORIZED,UNLOCK_DIESEL_S10,liberar somente diesel S10 quando mapeado
+T004,incompativel,diesel,gasolina,DENIED,LOCK_ALL,nunca liberar gasolina
+T005,multicombustivel,flex,etanol,AUTHORIZED,UNLOCK_ETANOL,liberar somente a escolha compativel
+T006,multicombustivel,flex,gasolina,AUTHORIZED,UNLOCK_GASOLINA,liberar somente a escolha compativel
+T007,multicombustivel,flex,diesel_s10,DENIED,LOCK_ALL,nunca liberar opcao fora da lista
+T008,eletrico,eletrico,gasolina,DENIED,LOCK_ALL,nao existe combustivel liquido compativel
+T009,hibrido,hibrido_gasolina,gasolina,AUTHORIZED,UNLOCK_GASOLINA,usar mapeamento explicitamente versionado
+T010,convertido,convertido_gnv,gnv,REVIEW_REQUIRED,LOCK_ALL,conversao exige regra/dado aprovado
+T011,nao_encontrado,not_found,gasolina,REVIEW_REQUIRED,LOCK_ALL,ausencia de dado nunca autoriza
+T012,placa_invalida,invalid_plate,gasolina,REVIEW_REQUIRED,LOCK_ALL,validacao falha antes do provedor
+T013,indisponibilidade,timeout,gasolina,REVIEW_REQUIRED,LOCK_ALL,timeout nunca autoriza
+T014,ambiguidade,unknown_code,gasolina,REVIEW_REQUIRED,LOCK_ALL,codigo desconhecido bloqueia
+T015,override,timeout,gasolina,AUTHORIZED,UNLOCK_GASOLINA,somente supervisor autenticado com justificativa
+T016,override_invalido,timeout,gasolina,REVIEW_REQUIRED,LOCK_ALL,frentista nao pode executar override
+T017,ttl,gasolina,gasolina,EXPIRED,LOCK_ALL,expiracao bloqueia antes de novo comando
+T018,duplicidade,gasolina,gasolina,AUTHORIZED,NO_SECOND_ACTUATION,command_id deve ser idempotente
+T019,perda_comunicacao,gasolina,gasolina,LOCKED,LOCK_ALL,dispositivo retorna ao estado seguro
+T020,restart_dispositivo,nao_aplicavel,nao_aplicavel,LOCKED,LOCK_ALL,inicializacao sempre bloqueada
+T021,override_incompatibilidade,gasolina,diesel_s10,DENIED,LOCK_ALL,supervisor nao converte incompatibilidade confirmada em autorizacao
+T022,override_expirado,gasolina,gasolina,EXPIRED,LOCK_ALL,autorizacao expirada exige nova consulta
+T023,override_falha_dispositivo,offline,gasolina,REVIEW_REQUIRED,LOCK_ALL,override nao contorna DISPENSER_UNAVAILABLE e exige nova consulta
+T024,override_bomba_desconhecida,nao_aplicavel,gasolina,REVIEW_REQUIRED,LOCK_ALL,override nao contorna PUMP_NOT_CONFIGURED
+T025,bomba_ocupada,gasolina,etanol,REVIEW_REQUIRED,KEEP_CURRENT,segunda solicitacao nao substitui autorizacao ativa na mesma bomba
+T026,concorrencia,gasolina_e_etanol,simultaneos,ONE_AUTHORIZED,ONE_NOZZLE,duas solicitacoes concorrentes deixam exatamente uma autorizacao ativa
+T027,review_vencido,timeout,gasolina,EXPIRED,LOCK_ALL,override fora da janela curta exige nova consulta
+T028,override_antigo,timeout_depois_gasolina,gasolina,CONFLICT,KEEP_CURRENT,review antigo nao interrompe autorizacao ativa mais nova

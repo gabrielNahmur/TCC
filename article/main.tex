@@ -1,0 +1,141 @@
+\documentclass[12pt]{article}
+
+% Template institucional publicado para o TADS/IFSul Bagé e derivado do modelo SBC.
+\usepackage{sbc-template}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{xurl}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage[hidelinks]{hyperref}
+
+\input{metadados}
+
+\hypersetup{
+  pdftitle={\TituloTCC},
+  pdfauthor={\AutorTCC},
+  pdfsubject={Trabalho de Conclusão de Curso - Seminário de Andamento},
+  pdfkeywords={abastecimento incompatível; intertravamento; consulta veicular; sistemas ciberfísicos; Design Science Research}
+}
+
+\addto\captionsbrazil{\renewcommand{\refname}{Referências}}
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist[itemize]{leftmargin=1.27cm}
+\setlist[enumerate]{leftmargin=1.27cm}
+\emergencystretch=2em
+
+% Marcadores editoriais: devem permanecer visíveis enquanto a evidência não existir.
+\newcommand{\pendente}[1]{\textcolor{red!65!black}{\textbf{[PENDENTE: #1]}}}
+\newcommand{\naorealizado}{\textit{Não realizado até esta versão do seminário.}}
+\newcommand{\fontepropria}{Fonte: elaborado pelo autor (2026).}
+
+\title{\TituloTCC}
+\author{\AutorTCC}
+\address{\InstituicaoTCC\\
+  \CampusTCC\\
+  \CursoTCC\\
+  Orientação: \OrientadorTCC\\
+  \CidadeDataTCC
+  \email{\EmailAutor}
+}
+
+\begin{document}
+\raggedbottom
+
+\maketitle
+
+\begin{center}
+\fcolorbox{black!55}{black!3}{%
+  \parbox{0.88\textwidth}{\small\textbf{Versão de andamento.}
+  Este manuscrito documenta decisões, evidências e artefatos existentes até o
+  momento. Campos em vermelho indicam informação ainda não obtida ou não
+  validada. Nenhum resultado de entrevista, teste físico ou economia realizada
+  é antecipado.}}
+\end{center}
+
+\begin{abstract}
+Vehicle misfuelling can generate operational disruption and repair costs, while
+the prevention of the error depends on barriers that act before fuel delivery.
+This ongoing study aims to design, implement and evaluate a bench prototype
+that combines vehicle-data querying, a fuel-compatibility policy and nozzle
+interlocking. The research follows Design Science Research and a case study in
+an anonymized fuel-station network. The planned evaluation covers functional
+safety, fault handling, latency, usability and an economic sensitivity
+analysis. Preliminary documentary analysis identified that fuel code and
+description belong to the detailed vehicle query of the Brazilian National
+Traffic Secretariat and that access depends on authorization and contracts with
+the federal service provider and a consent-management company. A simulated
+FastAPI backend, a React progressive web application and experimental ESP32
+firmware were also produced. On 29 July 2026, local verification passed 82
+backend tests with 93\% statement coverage, 12 interface tests, a
+host-side test of the firmware interlocking logic and a successful PlatformIO
+build for the \path{esp32dev} target. These results cover separate software
+components only: there has been no end-to-end MQTT test, firmware upload to an
+ESP32 board or physical bench test. Historical company data and interviews also
+remain pending; therefore, neither hypothesis has been fully tested.
+
+\par\smallskip\noindent\textbf{Keywords:} Vehicle misfuelling,
+Interlocking, Vehicle data, Cyber-physical system, Design Science Research.
+\end{abstract}
+
+\begin{resumo}
+O abastecimento de um veículo com combustível incompatível pode gerar
+transtornos operacionais e custos de reparação, enquanto sua prevenção exige
+barreiras que atuem antes da liberação do produto. Este trabalho em andamento
+objetiva projetar, implementar e avaliar, em bancada, um protótipo que combine
+consulta de dados veiculares, política de compatibilidade e intertravamento de
+bicos. A pesquisa adota a metodologia \textit{Design Science Research} e um
+estudo de caso em uma rede de postos anonimizada. A avaliação planejada abrange
+segurança funcional, tratamento de falhas, latência, usabilidade e análise
+econômica por cenários. Como resultados parciais, a análise documental
+identificou que código e descrição do combustível integram a consulta veicular
+detalhada da Secretaria Nacional de Trânsito e que o acesso depende de
+autorização e de contratos com o provedor federal e uma gerenciadora de
+consentimento e ciência. Também foram produzidos um backend simulado em
+FastAPI, uma PWA em React e um firmware experimental para ESP32. Em verificação
+local de 29 de julho de 2026, passaram 82 testes do backend, com 93\% de
+cobertura de instruções, 12 testes da interface, o teste, em computador,
+da lógica de intertravamento do firmware e a compilação PlatformIO para o alvo
+\path{esp32dev}. Esses resultados abrangem componentes de software isolados:
+ainda não houve teste ponta a ponta por MQTT, gravação e execução em uma placa
+ESP32 ou ensaio físico de bancada. Dados históricos e entrevistas
+também estão pendentes; por isso, nenhuma das hipóteses foi integralmente
+testada.
+
+\par\smallskip\noindent\textbf{Palavras-chave:} Abastecimento incompatível,
+Intertravamento, Consulta veicular, Sistema ciberfísico, Design Science Research.
+\end{resumo}
+
+\input{sections/01-introducao}
+\input{sections/02-fundamentacao}
+\input{sections/03-revisao-literatura}
+\input{sections/04-metodologia}
+\input{sections/05-requisitos}
+\input{sections/06-arquitetura}
+\input{sections/07-modelagem}
+\input{sections/08-implementacao}
+\input{sections/09-demonstracao}
+\input{sections/10-avaliacao-resultados}
+\input{sections/11-cronograma}
+\input{sections/12-limitacoes}
+\input{sections/13-trabalhos-futuros}
+\input{sections/14-conclusao}
+
+\bibliographystyle{sbc}
+\bibliography{referencias}
+
+\end{document}

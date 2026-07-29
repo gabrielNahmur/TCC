@@ -1,0 +1,29 @@
+\section{Limitações}
+\label{sec:limitacoes}
+
+O escopo impõe limitações necessárias. O protótipo de bancada não reproduz
+atmosfera explosiva, bomba certificada, vazão, interferências de pista nem todos
+os tempos de uma operação comercial. Atuadores comuns representam visualmente
+o bloqueio, mas não demonstram aptidão industrial. A consulta real depende de
+aprovação externa, contratos e documentação técnica ainda não disponíveis; por
+isso, o simulador é a fonte padrão do desenvolvimento.
+
+O MVP de software também é restrito ao próprio computador. Identidades de
+frentista e supervisor são autodeclaradas, e o token de supervisor é global;
+portanto, os testes atuais não demonstram autenticação individual, segregação de
+funções ou segurança de uma implantação em rede. O uso de HMAC reduz a exposição
+de identificadores na persistência e no cache, mas não transforma o dado de
+origem em anônimo nem elimina a necessidade de proteger o segredo.
+
+O estudo de caso pode conter poucos incidentes, registros heterogêneos e custos
+incompletos. Entrevistas intencionais fornecem compreensão contextual, mas não
+estimativa populacional. A presença do pesquisador na organização pode influir
+na coleta e interpretação. A análise econômica será contrafactual e sensível a
+volume de consultas, tarifa da GCC, vida útil e percentual de prevenção. Mesmo
+que H1 seja atendida em bancada, isso não comprovará eficácia, segurança ou
+conformidade em uma instalação real.
+
+Por fim, a descrição de combustível no cadastro veicular pode não representar
+alterações posteriores, conversões ou particularidades não cobertas pela
+política. Casos ambíguos serão bloqueados para revisão, o que preserva segurança
+mas pode reduzir disponibilidade e aumentar o tempo de atendimento.

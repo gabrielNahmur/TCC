@@ -1,0 +1,100 @@
+\section{Arquitetura}
+\label{sec:arquitetura}
+
+A arquitetura separa interface, decisão, integração externa e acionamento. A
+PWA não acessa SENATRAN ou dispositivo diretamente. O backend consulta um
+\textit{VehicleDataProvider}, entrega apenas categorias normalizadas ao motor de
+política e, se autorizado, envia ao \textit{DispenserGateway} um comando sem
+placa ou conteúdo da resposta veicular. A Figura~\ref{fig:arquitetura} apresenta
+essa organização.
+
+\begin{figure}[H]
+  \centering
+  \noindent\resizebox{0.98\textwidth}{!}{\begin{tikzpicture}[
+    node distance=6mm and 8mm,
+    bloco/.style={draw, rounded corners, align=center, minimum height=9mm,
+      text width=25mm, fill=black!3, font=\small},
+    externo/.style={bloco, dashed},
+    seta/.style={-{Latex[length=2mm]}, thick}
+  ]
+    \node[bloco] (ui) {PWA\\frentista/\\supervisor};
+    \node[bloco, right=of ui] (api) {API e controle\\de autorização};
+    \node[bloco, right=of api] (policy) {Política de\\compatibilidade};
+    \node[bloco, below=of api] (audit) {Auditoria\\minimizada};
+    \node[externo, above=of policy] (provider) {Provedor veicular\\simulado/\\autorizado};
+    \node[bloco, right=of policy] (gateway) {Gateway do\\dispensador};
+    \node[externo, right=of gateway] (device) {Simulador ou\\ESP32 de bancada};
+
+    \draw[seta] (ui) -- (api);
+    \draw[seta] (api) -- (provider);
+    \draw[seta] (provider) -- (policy);
+    \draw[seta] (api) -- (policy);
+    \draw[seta] (policy) -- (gateway);
+    \draw[seta] (gateway) -- (device);
+    \draw[seta] (api) -- (audit);
+    \draw[seta] (policy) -- (audit);
+  \end{tikzpicture}}
+  \caption{Arquitetura lógica-alvo do protótipo}
+  \label{fig:arquitetura}
+  \fontepropria
+\end{figure}
+
+\subsection{Interfaces principais}
+
+A operação principal já é exposta pelo backend simulado como
+\texttt{POST} \path{/api/v1/authorizations}, recebendo placa, combustível solicitado,
+identificador do frentista, bomba e um UUID \path{client_request_id}. Repetir a
+mesma chave com o mesmo corpo retorna a decisão persistida sem novo comando; a
+reutilização com conteúdo diferente retorna conflito. A resposta tem estado,
+identificador da autorização, categorias compatíveis, código de motivo e
+expiração. Dados pessoais não são devolvidos à interface.
+
+O override é uma operação separada vinculada a uma autorização em
+\path{REVIEW_REQUIRED} causada por incerteza da consulta veicular. O contrato
+atual exige token Bearer, identificador declarado de supervisor e justificativa;
+autenticação individual permanece requisito não implementado. O contrato-alvo
+do dispositivo aceitará somente
+\path{LOCK_ALL} ou \path{UNLOCK(nozzle_id,ttl)}, acompanhados de
+\path{command_id}, sequência monotônica, sessão, horário de emissão e
+expiração, conforme o tipo da operação. Cada comando produzirá confirmação
+associada ao mesmo identificador e à mesma sequência.
+
+\subsection{Decisões tecnológicas}
+
+O incremento atual utiliza Python/FastAPI no backend, React na PWA e SQLite para
+persistência local minimizada. Um gateway em memória representa o dispensador.
+Há firmware experimental que implementa o contrato MQTT para ESP32, mas ele
+ainda não está integrado ao backend. PostgreSQL e contêineres permanecem opções
+para uma etapa posterior, não componentes já empregados. Essas escolhas são
+substituíveis: as regras de compatibilidade permanecem no domínio, e integrações
+são isoladas pelas interfaces \path{VehicleDataProvider} e
+\path{DispenserGateway}.
+
+Somente o modo sintético está habilitado: a configuração do backend rejeita a
+inicialização em modo SENATRAN, e o adaptador correspondente não realiza chamada
+externa. Essa barreira evita uso acidental de dados ou credenciais antes da
+autorização formal.
+
+O ESP32 é o controlador inicialmente recomendado para a bancada, acionando LEDs
+e, após revisão do orientador, servo ou solenoide de baixa tensão. Um Raspberry
+Pi poderá atuar como gateway local, mas não como mecanismo único de segurança.
+Para campo, a alternativa prioritária a estudar é integração com controlador de
+pista ou dispenser certificado. A documentação do Fuel Point PLUS, por exemplo,
+descreve identificação veículo-bico, consulta a servidor de autorização e
+abertura da bomba somente depois da aprovação \cite{gilbarcoFuelPoint2018}; ela
+serve como referência de arquitetura comercial, não como validação do protótipo.
+
+\subsection{Disponibilidade e falhas}
+
+O sistema não adotará \textit{fail-open}. Se o provedor estiver indisponível ou
+se a resposta não puder ser mapeada de maneira inequívoca, a decisão automática
+será \path{REVIEW_REQUIRED}. A organização deverá definir um procedimento
+manual seguro para continuidade operacional; o protótipo apenas registrará o
+override autorizado. Perda de comunicação depois da liberação fará o
+controlador bloquear localmente após o TTL, independentemente do backend.
+
+Se a PWA perder a resposta de criação, ela não presume bloqueio e não cria outra
+solicitação automaticamente: a reconciliação manual repete exatamente a mesma
+chave e o mesmo corpo. Se a resposta de override ou conclusão se perder, a
+interface consulta o estado pelo identificador já conhecido, sem repetir o
+comando físico. \path{PENDING_DEVICE} é tratado como estado físico desconhecido.

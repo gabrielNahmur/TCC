@@ -1,0 +1,24 @@
+QA da apresentação — 29/07/2026
+
+Artefato: seminario-andamento.pptx
+Fonte: build-deck.mjs (@oai/artifact-tool)
+Quantidade: 12 lâminas
+
+1. Renderização integral
+- render_slides.py produziu slide-1.png a slide-12.png.
+- O processo Node do runtime Windows encerrou após imprimir o JSON com os 12 caminhos; os arquivos foram gerados corretamente.
+
+2. Inspeção visual
+- As 12 lâminas foram abertas e inspecionadas individualmente em resolução integral.
+- Não foram observados clipping, sobreposição não intencional, título truncado, placeholder, conector atravessando rótulo ou conteúdo fora do canvas.
+
+3. Teste de overflow
+- slides_test.py ampliou o deck com 100 px de margem cinza e gerou os 12 renders de teste.
+- Como o mesmo encerramento do processo Node ocorreu depois da renderização, a etapa final foi executada diretamente com a função slides_test.inspect_images, mantendo DPI 120, margem de 100 px, tolerância e razão de padding do utilitário.
+- Resultado: overflow_slides = [] (0 de 12).
+
+4. Inspeção estrutural
+- 140 objetos com bbox inspecionados; 0 fora de 1280 x 720.
+- 12 de 12 lâminas contêm notas do apresentador.
+- 12 de 12 notas contêm a seção [Sources].
+- Nenhum texto de exemplo (Lorem ipsum, Title here, Supertitle, Thank you) permaneceu no deck.

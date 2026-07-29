@@ -1,0 +1,26 @@
+\section{Demonstração planejada}
+\label{sec:demonstracao}
+
+A demonstração do seminário será reprodutível e utilizará somente dados
+sintéticos. O roteiro mínimo conterá:
+
+\begin{enumerate}
+  \item veículo compatível com gasolina e solicitação de gasolina, com liberação
+  de um único bico;
+  \item veículo a diesel S10 e solicitação de gasolina, com negação;
+  \item veículo flex, com escolha de um produto compatível sem liberar os demais;
+  \item veículo não encontrado, código desconhecido e timeout, todos conduzidos
+  a \path{REVIEW_REQUIRED};
+  \item override de supervisor com justificativa e expiração curta;
+  \item mensagem duplicada, comando vencido e perda de comunicação, sem segunda
+  liberação e com retorno a \path{LOCK_ALL}.
+\end{enumerate}
+
+Cada execução guardará identificador do cenário, versão do software e da
+política, eventos esperados, eventos observados e resultado. Capturas da PWA e
+fotografias da bancada serão inseridas apenas após a execução, com dados
+sintéticos visíveis e legenda que identifique o ambiente controlado.
+
+\pendente{executar e registrar o roteiro integral, validar a PWA conectada ao
+backend e inserir telas e imagens próprias; não utilizar o modo demonstrativo
+isolado como evidência de integração concluída.}

@@ -1,0 +1,108 @@
+\section{Modelagem}
+\label{sec:modelagem}
+
+\subsection{Estados da autorização}
+
+A Figura~\ref{fig:estados} representa a máquina de estados conceitual almejada.
+A consulta começa em \path{QUERYING}. Produto incompatível conduz a
+\path{DENIED}; ausência, ambiguidade ou código desconhecido conduz a
+\path{REVIEW_REQUIRED}; e uma decisão compatível primeiro persiste a intenção
+\path{PENDING_DEVICE}. Somente o reconhecimento do comando promove a
+autorização para \path{AUTHORIZED}. Uma revisão excepcional permitida também
+passa por essa intenção, nunca diretamente para autorização. Expiração,
+conclusão, substituição ou falha retornam o dispositivo ao bloqueio.
+
+\begin{figure}[H]
+  \centering
+  \noindent\resizebox{0.98\textwidth}{!}{\begin{tikzpicture}[
+    node distance=8mm and 10mm,
+    estado/.style={draw, rounded corners, align=center, minimum height=9mm,
+      text width=25mm, fill=black!3, font=\small},
+    seta/.style={-{Latex[length=1.8mm]}, thick, font=\scriptsize}
+  ]
+    \node[estado] (locked) {LOCKED};
+    \node[estado, right=of locked] (query) {QUERYING};
+    \node[estado, right=of query] (pending) {PENDING\_\\DEVICE};
+    \node[estado, right=of pending] (authorized) {AUTHORIZED};
+    \node[estado, right=of authorized] (completed) {COMPLETED};
+    \node[estado, above=of query] (denied) {DENIED};
+    \node[estado, below=of query] (review) {REVIEW\_\\REQUIRED};
+    \node[estado, below=of authorized] (terminal) {EXPIRED/\\SUPERSEDED};
+
+    \draw[seta] (locked) -- (query);
+    \draw[seta] (query) -- node[above]{compatível} (pending);
+    \draw[seta] (query) -- node[left]{incompatível} (denied);
+    \draw[seta] (query) -- node[left]{incerto} (review);
+    \draw[seta] (review) -- node[below,sloped]{override} (pending);
+    \draw[seta] (pending) -- node[above]{ACK} (authorized);
+    \draw[seta] (authorized) -- (completed);
+    \draw[seta] (authorized) -- (terminal);
+  \end{tikzpicture}}
+  \caption{Máquina de estados conceitual da autorização}
+  \label{fig:estados}
+  \fontepropria
+\end{figure}
+
+Estados terminais, expiração, substituição e falhas conduzem ao estado físico
+bloqueado; esses retornos foram omitidos da figura para preservar a
+legibilidade. A implementação atual persiste \path{PENDING_DEVICE},
+\path{AUTHORIZED}, \path{DENIED}, \path{REVIEW_REQUIRED},
+\path{COMPLETED}, \path{EXPIRED} e \path{SUPERSEDED};
+\path{QUERYING}, \path{DISPENSING}, \path{LOCKED} e \path{CANCELLED}
+ainda não são estados de domínio materializados. Não existe transição de
+\path{DENIED}, \path{EXPIRED}, \path{COMPLETED} ou
+\path{SUPERSEDED} para \path{AUTHORIZED}. O override parte exclusivamente de
+\path{REVIEW_REQUIRED} e somente quando o motivo pertence às incertezas da
+consulta; falha de bomba, bico ou dispensador não pode ser contornada.
+
+Antes de enviar \path{UNLOCK}, o backend persiste a intenção e o identificador
+do comando. O gateway simulado aplica e confirma a operação de modo síncrono;
+então o backend registra o evento de ACK e promove a autorização. O firmware
+experimental já produz \path{COMMAND_ACK}, porém o backend ainda não consome
+esse evento por MQTT. Se o bloqueio compensatório falhar, a garantia residual é
+o TTL local do dispositivo, não um bloqueio imediato absoluto.
+
+\subsection{Tabela de decisão}
+
+\begin{table}[H]
+  \centering
+  \caption{Política preliminar de decisão}
+  \label{tab:decisao}
+  \small
+  \begin{tabularx}{\textwidth}{@{}L{2.4cm}L{2.7cm}L{2.4cm}Y@{}}
+    \toprule
+    \textbf{Resposta} & \textbf{Produto solicitado} & \textbf{Decisão} & \textbf{Efeito físico} \\
+    \midrule
+    Válida e inequívoca & Compatível & Autorizar & Liberar apenas o bico solicitado por TTL. \\
+    Válida e inequívoca & Incompatível & Negar & Manter todos bloqueados. \\
+    Inválida ou ausente & Qualquer & Revisar & Manter bloqueado; permitir fluxo de supervisor. \\
+    Código desconhecido & Qualquer & Revisar & Manter bloqueado e registrar versão da política. \\
+    Válida com múltiplos & Um compatível & Autorizar & Liberar somente o produto escolhido, nunca todos. \\
+    Conversão não comprovada & Qualquer & Revisar & Não inferir compatibilidade automaticamente. \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+
+\subsection{Modelo de dados minimizado}
+
+O modelo-alvo prevê \path{Authorization}, \path{PolicyVersion},
+\path{DeviceCommand}, \path{DeviceAck}, \path{Override} e
+\path{AuditEvent}. Na implementação corrente, o SQLite contém somente tabelas
+de autorização e eventos de auditoria; comandos ficam no gateway em memória, e
+os campos de override integram a autorização. Ainda não existem entidades
+persistidas para versão da política ou confirmação do dispositivo.
+
+A placa existe apenas em memória durante a consulta e não é chave de
+relacionamento persistente. O esquema atual guarda decisão, combustível
+solicitado, bomba, frentista, modo do provedor, motivo, horários e eventual
+override, além de \path{client_request_id} e um fingerprint HMAC para verificar
+idempotência. A consulta de compatibilidade usa cache temporário em memória,
+indexado por HMAC da placa normalizada, para evitar uma segunda consulta no
+mesmo fluxo. A chave HMAC fica fora do repositório; esse recurso reduz exposição,
+mas é pseudonimização técnica, não anonimização. Não há colunas para placa,
+Renavam, chassi, proprietário ou resposta bruta do provedor. Logs de pesquisa
+serão separados dos dados operacionais e conterão somente casos sintéticos.
+
+\pendente{validar o modelo e a enumeração oficial de códigos de combustível com
+a documentação técnica liberada no ambiente autorizado.}

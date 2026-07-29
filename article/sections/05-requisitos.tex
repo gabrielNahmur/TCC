@@ -1,0 +1,75 @@
+\section{Requisitos}
+\label{sec:requisitos}
+
+As Tabelas~\ref{tab:rf} e~\ref{tab:rnf} especificam requisitos-alvo do
+artefato completo; sua presença não significa que todos estejam implementados
+na versão de andamento. Os atores preliminares são: \textbf{frentista}, que solicita autorização;
+\textbf{supervisor}, que trata exceções justificadas; \textbf{administrador},
+que mantém usuários, bombas e política; \textbf{auditor/pesquisador}, que acessa
+dados minimizados; \textbf{provedor veicular}, simulado ou autorizado; e
+\textbf{controlador de bancada}, que executa comandos restritos. Cliente e
+titular de dados não são usuários do protótipo, mas são partes interessadas em
+segurança, transparência e proteção de dados.
+
+\begin{table}[H]
+  \centering
+  \caption{Requisitos funcionais preliminares}
+  \label{tab:rf}
+  \small
+  \begin{tabularx}{\textwidth}{@{}L{1.1cm}Y@{}}
+    \toprule
+    \textbf{ID} & \textbf{Requisito} \\
+    \midrule
+    RF01 & Receber identificador idempotente da solicitação, placa, combustível, frentista e bomba, validando os campos. \\
+    RF02 & Consultar um \textit{VehicleDataProvider} sem expor credenciais ao cliente web. \\
+    RF03 & Converter códigos externos em categorias internas versionadas e registrar a versão da regra. \\
+    RF04 & Retornar \path{AUTHORIZED}, \path{DENIED} ou \path{REVIEW_REQUIRED} com motivo padronizado. \\
+    RF05 & Liberar temporariamente somente o bico associado ao produto solicitado e compatível. \\
+    RF06 & Bloquear todos os bicos após expiração, encerramento, reinicialização ou perda de comunicação. \\
+    RF07 & Permitir override somente a supervisor autenticado, com justificativa e validade limitada. \\
+    RF08 & Rejeitar comando duplicado ou vencido e registrar a confirmação do dispositivo. \\
+    RF09 & Manter trilha de auditoria minimizada, sem placa ou resposta veicular bruta no log padrão. \\
+    RF10 & Operar com provedores e gateways simulados para desenvolvimento e demonstração sem dado real. \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Requisitos não funcionais e restrições preliminares}
+  \label{tab:rnf}
+  \small
+  \begin{tabularx}{\textwidth}{@{}L{1.2cm}L{2.9cm}Y@{}}
+    \toprule
+    \textbf{ID} & \textbf{Atributo} & \textbf{Critério} \\
+    \midrule
+    RNF01 & Segurança funcional & Estado inicial e estado após falha devem ser \path{LOCK_ALL}. \\
+    RNF02 & Privacidade & Usar minimização e não persistir placa, chassi, Renavam, proprietário ou resposta bruta por padrão. \\
+    RNF03 & Segurança lógica & Credenciais externas ao repositório, autenticação individual e menor privilégio. \\
+    RNF04 & Auditabilidade & Toda decisão e override deve registrar horário, ator, motivo, versão da política e resultado do dispositivo. \\
+    RNF05 & Interoperabilidade & Provedor e gateway devem respeitar interfaces substituíveis, sem acoplamento do domínio à SENATRAN ou ao ESP32. \\
+    RNF06 & Desempenho & Medir mediana, P95 e máximo; o limite operacional será definido após linha de base, sem número arbitrário nesta versão. \\
+    RNF07 & Reprodutibilidade & Casos sintéticos, configuração de bancada e testes devem ser versionados. \\
+    RNF08 & Segurança física & Operar apenas em bancada seca e de baixa tensão; instalação real fica fora do escopo. \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+
+Na versão verificada em 29 de julho de 2026, o backend já executa decisões com
+provedor e dispensador simulados, rejeita comandos duplicados ou vencidos e
+mantém auditoria minimizada. A repetição de uma solicitação com o mesmo
+\path{client_request_id} e o mesmo conteúdo recupera a decisão existente sem
+novo acionamento; conteúdo divergente gera conflito. Entretanto, RF03, RF07,
+RF08, RNF03 e RNF04 estão
+apenas parcialmente atendidos: ainda não há versão de política persistida,
+autenticação individual nem registro integrado de confirmação física. O
+override usa um token Bearer compartilhado e recebe o identificador de
+supervisor informado na requisição; isso demonstra o fluxo, mas não comprova a
+identidade do ator. O firmware experimental emite confirmações, porém o backend
+ainda não possui gateway MQTT que as consuma e persista.
+
+Os requisitos serão validados com o orientador e, depois das autorizações
+necessárias, com representantes dos papéis operacionais. Alterações serão
+rastreáveis até a motivação, o cenário e o teste correspondente.

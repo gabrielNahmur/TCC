@@ -1,0 +1,146 @@
+\section{Metodologia}
+\label{sec:metodologia}
+
+\subsection{Delineamento da pesquisa}
+
+A pesquisa é aplicada, de abordagem mista e objetivo exploratório-descritivo.
+O eixo de construção seguirá a \textit{Design Science Research Methodology}
+(DSRM), que organiza o trabalho em identificação do problema, definição dos
+objetivos, projeto e desenvolvimento, demonstração, avaliação e comunicação
+\cite{peffersEtAl2007}. A adoção da DSRM é adequada porque a contribuição inclui
+um artefato destinado a resolver um problema organizacional, cuja utilidade
+precisa ser demonstrada e avaliada \cite{hevnerEtAl2004}.
+
+Em paralelo, será realizado um estudo de caso único, com unidades de análise
+incorporadas correspondentes a funções e, quando autorizado, a diferentes
+unidades da rede. O estudo de caso contextualizará o processo, os incidentes e
+as restrições organizacionais, seguindo recomendações de planejamento,
+triangulação e relato de \cite{runesonHost2009}. A empresa será identificada no
+texto apenas como ``uma rede de postos de combustíveis do sul do Brasil''.
+
+\begin{table}[H]
+  \centering
+  \caption{Etapas da DSRM e evidências previstas}
+  \label{tab:dsrm}
+  \small
+  \begin{tabularx}{\textwidth}{@{}L{3.1cm}YL{2.5cm}@{}}
+    \toprule
+    \textbf{Etapa} & \textbf{Evidência ou produto} & \textbf{Estado} \\
+    \midrule
+    Identificar problema & Registros anonimizados, entrevistas e descrição do processo & Parcial; dados pendentes \\
+    Definir objetivos & Pergunta, hipóteses, objetivos e critérios de aceitação & Elaborado \\
+    Projetar e desenvolver & Requisitos, arquitetura, simuladores, software e bancada & Software parcial; bancada pendente \\
+    Demonstrar & Roteiro reproduzível com casos compatíveis, incompatíveis e falhas & Componentes simulados; roteiro integral pendente \\
+    Avaliar & Testes funcionais, falhas, latência, usabilidade e cenários econômicos & Verificação automatizada parcial \\
+    Comunicar & Artigo, repositório, seminário e defesa & Em andamento \\
+    \bottomrule
+  \end{tabularx}
+  \\[2pt]\fontepropria
+\end{table}
+
+\subsection{Caracterização do processo e entrevistas}
+
+Serão convidados, conforme autorização e disponibilidade, frentistas de mais de
+uma unidade, gestores operacionais, representante da direção e profissional do
+setor financeiro. A amostra será intencional e buscará diversidade de papéis,
+turnos e unidades, sem pretensão de representatividade estatística. O roteiro
+semiestruturado abrangerá sequência de atendimento, pontos de conferência,
+causas percebidas, tratamento de exceções, consequências e aceitação de uma
+barreira automatizada.
+
+As entrevistas somente ocorrerão após autorização escrita da empresa,
+orientação formal sobre o enquadramento ético e, quando aplicável, aprovação do
+Comitê de Ética em Pesquisa (CEP). Serão adotados consentimento, participação
+voluntária e plano de anonimização, retenção e descarte coerentes com a
+Resolução CNS n\textsuperscript{o} 510/2016 \cite{cns5102016}. Gravação será opcional e dependerá
+de consentimento específico. A análise utilizará codificação temática; as
+categorias, decisões de codificação e trechos anonimizados serão registrados
+para auditabilidade, sem expor pessoas ou unidades.
+
+\pendente{registrar a decisão do orientador/CEP, a autorização da empresa, os
+critérios finais de recrutamento e o número efetivamente entrevistado.}
+
+\subsection{Dados históricos e custos}
+
+A coleta documental solicitará um conjunto mínimo: identificador artificial da
+ocorrência, período, unidade pseudonimizada, categorias de combustível,
+momento de detecção, fonte documental e componentes comprovados do custo. Placa,
+nome de cliente, nome de funcionário, chassi, Renavam e relato livre
+identificável não serão inseridos na base de pesquisa.
+
+Os valores serão classificados em custo documentado, estimativa e impacto
+qualitativo. Somente itens suportados por registros serão somados como perdas
+realizadas. Quando a série abranger datas diferentes, a correção para a data-base
+usará o IPCA oficial \cite{ibgeIpca2026}, conforme a Equação~\ref{eq:ipca}:
+
+\begin{equation}
+  V_{corrigido}=V_{evento}\times
+  \frac{IPCA_{data\mbox{-}base}}{IPCA_{evento}}.
+  \label{eq:ipca}
+\end{equation}
+
+A taxa de incidentes por abastecimento somente será calculada se numerador e
+denominador tiverem mesma população, período e unidades. Sem essa compatibilidade,
+serão apresentadas apenas contagens e custos absolutos. O dicionário e as regras
+de qualidade estão em \texttt{research/data/dicionario-dados.md}.
+
+\subsection{Construção do artefato}
+
+O desenvolvimento é incremental. Já foram implementados o domínio, o provedor
+veicular simulado, a política de compatibilidade, o simulador de bicos, a API,
+a auditoria minimizada em SQLite e uma PWA. Também existe firmware experimental,
+cuja lógica portátil foi verificada em computador e cujo alvo \path{esp32dev}
+foi compilado com PlatformIO. Autenticação individual,
+persistência da versão da política, gateway MQTT no backend e integração entre
+os componentes permanecem pendentes. A bancada física somente será montada após
+validação do circuito e dos componentes com o orientador. A integração real com
+SENATRAN permanecerá desativada até a obtenção das autorizações e credenciais
+necessárias.
+
+Cada cenário de demonstração terá entrada, estado inicial, eventos, decisão
+esperada, comando esperado e estado final. A política e os contratos de
+interface serão mantidos independentes da tecnologia física, permitindo trocar
+um atuador simulado por um controlador de bancada sem modificar a regra de
+negócio.
+
+\subsection{Plano de avaliação}
+
+A avaliação combinará cinco dimensões:
+
+\begin{enumerate}
+  \item \textbf{correção funcional:} decisão para veículos e produtos
+  compatíveis, incompatíveis, multicombustível e desconhecidos;
+  \item \textbf{segurança diante de falhas:} timeout, resposta inválida, perda
+  de comunicação, reinicialização, mensagem duplicada e expiração;
+  \item \textbf{desempenho:} latência ponta a ponta com mediana, percentil 95 e
+  máximo, separando provedor, backend e dispositivo;
+  \item \textbf{usabilidade:} conclusão da tarefa, erros, tempo e percepção dos
+  participantes autorizados, com estatística descritiva; e
+  \item \textbf{viabilidade econômica:} custo anualizado e perdas evitáveis sob
+  cenários de 25\%, 50\%, 75\% e 100\% de prevenção.
+\end{enumerate}
+
+Sejam $Q$ o número anual de consultas, $c_q$ o custo unitário, $C_{GCC}$ a
+remuneração anual da GCC, $C_{infra}$ infraestrutura, $C_{man}$ manutenção e
+$C_{hw,a}$ a parcela anualizada do hardware. O custo anual da solução será:
+
+\begin{equation}
+  C_{\mathrm{sol}}=Q c_q+C_{GCC}+C_{infra}+C_{man}+C_{hw,a}.
+  \label{eq:custo-solucao}
+\end{equation}
+
+Para uma perda histórica anual corrigida $L$ e percentual de prevenção $p$, o
+benefício líquido contrafactual será $B(p)=pL-C_{\mathrm{sol}}$. Quando $L>0$, o ponto
+de equilíbrio será $p^{*}=C_{\mathrm{sol}}/L$. O modelo não incluirá ganho de imagem,
+fidelização ou risco jurídico sem método e evidência próprios.
+
+\subsection{Ameaças à validade}
+
+As principais ameaças previstas são registros incompletos, memória seletiva nas
+entrevistas, pequena amostra, influência do pesquisador que também trabalha na
+empresa, uso de simulador, diferença entre bancada e pista e mudanças de preço
+ou regulação. As estratégias de mitigação incluem triangulação entre fontes,
+roteiro comum, registro de decisões, dados sintéticos versionados, repetição dos
+ensaios, relato de casos divergentes, revisão pelo orientador e atualização das
+fontes oficiais na data da análise. Nenhuma generalização para outros postos ou
+uma instalação real será feita sem evidência correspondente.
