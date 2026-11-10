@@ -14,6 +14,8 @@ from .api import router
 from .config import Settings
 from .dispenser import SimulatedDispenserGateway
 from .domain import AuthorizationRepository, DispenserGateway, VehicleDataProvider
+from .lab import router as lab_router
+from .mqtt_dispenser import MqttDispenserGateway
 from .providers import MockVehicleDataProvider
 from .repository import SqliteAuthorizationRepository
 from .service import AuthorizationService, utc_now
@@ -30,7 +32,22 @@ def create_app(
     active_settings = settings or Settings.from_env()
     active_settings.validate()
     active_provider = provider or MockVehicleDataProvider()
-    active_gateway = gateway or SimulatedDispenserGateway(clock=clock)
+    if gateway is not None:
+        active_gateway = gateway
+    elif active_settings.dispenser_mode == "mqtt":
+        active_gateway = MqttDispenserGateway(
+            host=active_settings.mqtt_host,
+            port=active_settings.mqtt_port,
+            topic_prefix=active_settings.mqtt_topic_prefix,
+            device_id=active_settings.mqtt_device_id,
+            pump_id=active_settings.mqtt_pump_id,
+            username=active_settings.mqtt_username,
+            password=active_settings.mqtt_password,
+            use_tls=active_settings.mqtt_use_tls,
+            ack_timeout_seconds=active_settings.mqtt_ack_timeout_seconds,
+        )
+    else:
+        active_gateway = SimulatedDispenserGateway(clock=clock)
     active_repository = repository or SqliteAuthorizationRepository(
         active_settings.database_path
     )
@@ -47,6 +64,9 @@ def create_app(
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         yield
+        close_gateway = getattr(active_gateway, "close", None)
+        if close_gateway is not None:
+            close_gateway()
         close = getattr(active_repository, "close", None)
         if close is not None:
             close()
@@ -137,6 +157,7 @@ def create_app(
         return {"status": "ok", "provider_mode": active_provider.mode}
 
     application.include_router(router)
+    application.include_router(lab_router)
     return application
 
 

@@ -63,3 +63,37 @@ export interface OverrideRequest {
   justification: string;
   token: string;
 }
+
+export interface LabNozzle {
+  fuel: Fuel;
+  nozzle_id: string;
+  gpio: number;
+}
+
+export interface LabTrace {
+  event_id: string;
+  timestamp: string;
+  direction: "BACKEND_TO_DEVICE" | "DEVICE_TO_BACKEND";
+  event: string;
+  command_id?: string | null;
+  command_type?: string | null;
+  nozzle_id?: string | null;
+  sequence?: number | null;
+  result?: string | null;
+  reason?: string | null;
+}
+
+export interface LabState {
+  pump_id: string;
+  gateway_mode: "visual" | "simulated" | "mqtt";
+  transport: "visual" | "in_memory" | "mqtt";
+  controls_enabled: boolean;
+  online: boolean;
+  session_id: string;
+  unlocked_nozzle_id: string | null;
+  unlock_expires_at: string | null;
+  last_sequence: number;
+  emergency_stop_active: boolean;
+  nozzles: LabNozzle[];
+  traces: LabTrace[];
+}

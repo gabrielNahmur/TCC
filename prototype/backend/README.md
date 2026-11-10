@@ -1,8 +1,9 @@
 # Backend do protótipo
 
 API FastAPI do protótipo acadêmico de prevenção de abastecimento incompatível.
-O modo disponível é totalmente simulado: usa placas sintéticas, não chama a
-SENATRAN e não deve ser conectado a uma bomba real.
+O provedor veicular disponível é totalmente sintético e não chama a SENATRAN.
+O dispensador pode operar com gateway Python simulado ou adaptador MQTT para a
+bancada PICSimLab/ESP32; nenhum desses modos deve ser conectado a uma bomba real.
 
 ## Execução local
 
@@ -39,6 +40,10 @@ os testes:
 - `GET /api/v1/authorizations/{id}`: consulta o estado operacional.
 - `GET /api/v1/authorizations/{id}/audit`: consulta protegida da trilha de
   auditoria.
+- `GET /api/v1/lab/pumps/{pump_id}`: estado operacional e telemetria minimizada
+  usados pela bancada digital. Não retorna placa nem resposta veicular.
+- os endpoints de conectividade e parada em `/api/v1/lab` existem somente para
+  ensaiar falhas no `SimulatedDispenserGateway`; em MQTT real retornam conflito.
 
 As placas nunca aparecem em URLs. O banco registra somente decisão, produto
 solicitado, identificadores operacionais, horários, motivo, modo do provedor e
@@ -84,3 +89,24 @@ representam veículos reais e existem apenas para testes.
 - O dispositivo nunca recebe placa nem resposta veicular.
 - `PROVIDER_MODE=senatran` encerra o startup com erro intencional. Uma integração
   real só poderá ser adicionada após autorização formal e desenho de segurança.
+
+## Gateway MQTT para PICSimLab/ESP32
+
+O modo padrão continua sendo seguro e em memória (`DISPENSER_MODE=simulated`).
+Para o ensaio completo, inicie o broker local e configure:
+
+```powershell
+$env:DISPENSER_MODE = "mqtt"
+$env:MQTT_HOST = "127.0.0.1"
+$env:MQTT_PORT = "1883"
+$env:MQTT_DEVICE_ID = "esp32-bancada-01"
+$env:MQTT_PUMP_ID = "pump-01"
+.\.venv\Scripts\python -m uvicorn app.main:app --reload
+```
+
+O adaptador publica QoS 1 sem retenção, espera um `COMMAND_ACK` e valida
+`command_id`, `sequence`, sessão, estado e bico antes de devolver sucesso ao
+serviço. Broker offline, ACK ausente ou ACK incoerente resultam em bloqueio.
+
+O ambiente MQTT local sem autenticação descrito em `prototype/infra` é somente
+para o PICSimLab no mesmo computador. Não deve ser exposto na rede corporativa.

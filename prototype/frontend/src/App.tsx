@@ -18,6 +18,7 @@ import {
 import { api, ApiError } from "./api";
 import { config } from "./config";
 import { demoVehicles } from "./demo";
+import LabBench from "./LabBench";
 import type {
   AuthorizationDecision,
   CompatibilityCheck,
@@ -103,6 +104,7 @@ function Stepper({ current }: { current: number }) {
 }
 
 export default function App() {
+  const [activeView, setActiveView] = useState<"operation" | "lab">("operation");
   const [plate, setPlate] = useState("");
   const [attendantId, setAttendantId] = useState("attendant-01");
   const [pumpId, setPumpId] = useState("pump-01");
@@ -128,7 +130,7 @@ export default function App() {
   const safetyLabel = deviceStateUnknown
     ? "Estado físico desconhecido"
     : authorizationActive
-      ? "Um bico autorizado"
+      ? "Uma trava autorizada"
       : decision?.reason_code === "PUMP_BUSY"
         ? "Outra autorização pode estar ativa"
         : "Sem liberação nesta operação";
@@ -321,7 +323,29 @@ export default function App() {
         </div>
       </header>
 
+      <nav className="view-tabs" aria-label="Áreas do protótipo">
+        <button
+          type="button"
+          className={activeView === "operation" ? "is-active" : ""}
+          aria-current={activeView === "operation" ? "page" : undefined}
+          onClick={() => setActiveView("operation")}
+        >
+          Operação
+        </button>
+        <button
+          type="button"
+          className={activeView === "lab" ? "is-active" : ""}
+          aria-current={activeView === "lab" ? "page" : undefined}
+          onClick={() => setActiveView("lab")}
+        >
+          Bancada digital
+          {authorizationActive && <span className="live-dot" aria-label="autorização ativa" />}
+        </button>
+      </nav>
+
       <main>
+        {activeView === "operation" ? (
+        <>
         <section className="intro-panel" aria-labelledby="operation-title">
           <div>
             <p className="kicker">Operação assistida</p>
@@ -562,7 +586,7 @@ export default function App() {
                 </p>
                 <h3>
                   {authorizationActive
-                    ? `${fuelLabels[decision.requested_fuel]} liberado na ${decision.pump_id ?? pumpId}`
+                    ? `Trava de ${fuelLabels[decision.requested_fuel]} liberada na ${decision.pump_id ?? pumpId}`
                     : completed
                       ? "Operação encerrada"
                       : decision.status === "AUTHORIZED" || decision.status === "EXPIRED"
@@ -577,7 +601,7 @@ export default function App() {
                 </h3>
                 <p>
                   {authorizationActive
-                    ? "Somente o bico correspondente pode permanecer liberado."
+                    ? "Somente a trava do bico correspondente pode permanecer liberada."
                     : completed
                       ? reasonMessages.AUTHORIZATION_COMPLETED
                       : decision.status === "AUTHORIZED" || decision.status === "EXPIRED"
@@ -697,6 +721,15 @@ export default function App() {
             <span>Sem combustível e fora de área classificada. Uma instalação real exige engenharia, integração e equipamentos certificados.</span>
           </div>
         </aside>
+        </>
+        ) : (
+          <LabBench
+            decision={decision}
+            demoMode={demoMode}
+            pumpId={pumpId}
+            remainingSeconds={remainingSeconds}
+          />
+        )}
       </main>
 
       <footer>

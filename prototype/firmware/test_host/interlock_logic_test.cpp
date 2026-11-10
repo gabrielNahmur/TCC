@@ -7,7 +7,18 @@
 int main() {
   using interlock::ApplyCode;
   using interlock::Controller;
+  using interlock::EmergencyStopEdge;
+  using interlock::EmergencyStopTransition;
   using interlock::Nozzle;
+
+  EmergencyStopEdge emergency_stop;
+  assert(emergency_stop.update(false) == EmergencyStopTransition::NONE);
+  assert(emergency_stop.update(true) == EmergencyStopTransition::ACTIVATED);
+  assert(emergency_stop.active());
+  assert(emergency_stop.update(true) == EmergencyStopTransition::NONE);
+  assert(emergency_stop.update(false) == EmergencyStopTransition::RELEASED);
+  assert(!emergency_stop.active());
+  assert(emergency_stop.update(false) == EmergencyStopTransition::NONE);
 
   Controller controller;
   assert(!controller.state().unlocked);

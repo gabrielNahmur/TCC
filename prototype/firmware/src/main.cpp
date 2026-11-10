@@ -40,13 +40,13 @@ WiFiClient network_client;
 PubSubClient mqtt(network_client);
 Preferences preferences;
 interlock::Controller controller;
+interlock::EmergencyStopEdge emergency_stop_edge;
 
 String command_topic;
 String event_topic;
 String boot_id;
 std::uint32_t last_wifi_attempt_ms = 0;
 std::uint32_t last_mqtt_attempt_ms = 0;
-bool emergency_stop_reported = false;
 
 void deenergizeAllOutputs() {
   digitalWrite(kGasolinePin, LOW);
@@ -228,6 +228,10 @@ void ensureMqtt(std::uint32_t now_ms) {
   applyPhysicalState();
   mqtt.subscribe(command_topic.c_str(), 1);
   publishEvent("DEVICE_ONLINE", "", "LOCKED_ON_CONNECT", "", true);
+  if (digitalRead(kEmergencyStopPin) == kEmergencyStopActiveLevel) {
+    forceLock("EMERGENCY_STOP_ACTIVE");
+    publishEvent("EMERGENCY_STOP", "", "APPLIED", "PHYSICAL_INPUT_ACTIVE");
+  }
 }
 
 }  // namespace
@@ -265,14 +269,19 @@ void setup() {
 void loop() {
   const std::uint32_t now_ms = millis();
 
-  if (digitalRead(kEmergencyStopPin) == kEmergencyStopActiveLevel) {
+  const bool emergency_stop_active =
+      digitalRead(kEmergencyStopPin) == kEmergencyStopActiveLevel;
+  const interlock::EmergencyStopTransition emergency_transition =
+      emergency_stop_edge.update(emergency_stop_active);
+  if (emergency_stop_active) {
     forceLock("EMERGENCY_STOP_ACTIVE");
-    if (!emergency_stop_reported) {
+    if (emergency_transition == interlock::EmergencyStopTransition::ACTIVATED) {
       publishEvent("EMERGENCY_STOP", "", "APPLIED", "PHYSICAL_INPUT_ACTIVE");
-      emergency_stop_reported = true;
     }
-  } else {
-    emergency_stop_reported = false;
+  } else if (emergency_transition == interlock::EmergencyStopTransition::RELEASED) {
+    // Soltar a emergência não religa nenhuma saída: o controlador segue
+    // bloqueado até receber uma nova autorização UNLOCK válida.
+    publishEvent("EMERGENCY_STOP_RELEASED", "", "READY", "PHYSICAL_INPUT_RELEASED");
   }
 
   if (WiFi.status() != WL_CONNECTED || !mqtt.connected()) {

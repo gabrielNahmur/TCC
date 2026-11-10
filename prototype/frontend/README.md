@@ -12,6 +12,38 @@ npm run dev
 
 O modo de demonstração vem habilitado e usa apenas placas sintéticas. Para conectar ao backend, configure `VITE_API_BASE_URL`, altere `VITE_DEMO_MODE=false` e mantenha o backend no mesmo ambiente controlado.
 
+## Bancada digital
+
+A aba **Bancada digital** possui duas vistas complementares:
+
+- **Vista da bancada**: planta React/SVG com estrutura cenográfica, cinco
+  mangueiras, bicos, travas nos suportes, ESP32, drivers, fonte de 12 V, fusível,
+  tablet e parada de emergência;
+- **Diagnóstico técnico**: GPIOs, sessão, TTL, sequência e histórico de
+  comandos/ACKs.
+
+Na planta, somente o bico cuja trava recebeu autorização pode ser retirado por
+arraste, toque ou botão. Se o TTL terminar, a comunicação cair ou a emergência
+for acionada com o bico fora, ele continua fora até uma devolução manual. A tela
+não simula um retorno físico automático.
+
+A retirada e a devolução são estados locais do navegador. O protótipo ainda não
+possui microswitch ou sensor Hall, portanto o ACK confirma somente o comando e o
+estado lógico do GPIO, não o movimento do pino nem a presença real do bico.
+
+- em modo de demonstração, a telemetria é didática e gerada no navegador;
+- com `VITE_DEMO_MODE=false`, a tela consulta o gateway real do backend;
+- `gateway_mode=simulated` mostra comandos realmente aplicados pelo objeto
+  Python em memória e habilita os controles de desconexão/emergência;
+- `gateway_mode=mqtt` mostra eventos do PICSimLab/ESP32 e desabilita controles
+  artificiais: falhas devem ser acionadas no próprio dispositivo.
+
+A tela nunca recebe nem exibe placa na telemetria do dispositivo.
+
+O sistema atua exclusivamente sobre a trava independente instalada no suporte
+do bico. Ele não comanda bombeamento, vazão, controlador de pista ou automação
+da empresa.
+
 ## Cenários sintéticos
 
 | Placa | Resultado esperado |

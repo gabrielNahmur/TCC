@@ -4,6 +4,7 @@ import type {
   AuthorizationDecision,
   AuthorizationRequest,
   CompatibilityCheck,
+  LabState,
   OverrideRequest
 } from "./types";
 
@@ -103,6 +104,30 @@ export const api = {
   getAuthorization(authorizationId: string) {
     return get<AuthorizationDecision>(
       `/api/v1/authorizations/${encodeURIComponent(authorizationId)}`
+    );
+  },
+
+  getLabState(pumpId: string) {
+    return get<LabState>(`/api/v1/lab/pumps/${encodeURIComponent(pumpId)}`);
+  },
+
+  setLabConnectivity(pumpId: string, online: boolean) {
+    return post<LabState>(
+      `/api/v1/lab/pumps/${encodeURIComponent(pumpId)}/connectivity`,
+      { online }
+    );
+  },
+
+  setLabEmergencyStop(pumpId: string, active: boolean) {
+    return post<LabState>(
+      `/api/v1/lab/pumps/${encodeURIComponent(pumpId)}/emergency-stop`,
+      { active }
+    );
+  },
+
+  clearLabTraces(pumpId: string) {
+    return post<LabState>(
+      `/api/v1/lab/pumps/${encodeURIComponent(pumpId)}/traces/clear`
     );
   }
 };

@@ -87,4 +87,42 @@ describe("contrato HTTP do backend", () => {
       justification: "Documento físico conferido."
     });
   });
+
+  it("consulta a telemetria sem enviar placa", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({
+        pump_id: "pump-01",
+        gateway_mode: "simulated",
+        transport: "in_memory",
+        controls_enabled: true,
+        online: true,
+        session_id: "session-01",
+        unlocked_nozzle_id: null,
+        unlock_expires_at: null,
+        last_sequence: 0,
+        emergency_stop_active: false,
+        nozzles: [],
+        traces: []
+      })
+    );
+
+    await api.getLabState("pump-01");
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("http://localhost:8000/api/v1/lab/pumps/pump-01");
+    expect(init?.method).toBe("GET");
+    expect(init?.body).toBeUndefined();
+  });
+
+  it("aciona a parada apenas pelo endpoint da bancada simulada", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({ emergency_stop_active: true })
+    );
+
+    await api.setLabEmergencyStop("pump-01", true);
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toContain("/api/v1/lab/pumps/pump-01/emergency-stop");
+    expect(JSON.parse(String(init?.body))).toEqual({ active: true });
+  });
 });

@@ -18,6 +18,23 @@ enum class ApplyCode : std::uint8_t {
   REJECTED_INVALID_NOZZLE
 };
 
+enum class EmergencyStopTransition : std::uint8_t { NONE = 0, ACTIVATED, RELEASED };
+
+class EmergencyStopEdge {
+ public:
+  EmergencyStopTransition update(bool active) {
+    if (active == active_) return EmergencyStopTransition::NONE;
+    active_ = active;
+    return active ? EmergencyStopTransition::ACTIVATED
+                  : EmergencyStopTransition::RELEASED;
+  }
+
+  [[nodiscard]] bool active() const { return active_; }
+
+ private:
+  bool active_{false};
+};
+
 struct State {
   bool unlocked{false};
   Nozzle nozzle{Nozzle::NONE};

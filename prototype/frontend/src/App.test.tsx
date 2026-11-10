@@ -40,7 +40,7 @@ describe("fluxo seguro de autorização", () => {
     await user.click(screen.getByRole("radio", { name: /Gasolina Compatível/ }));
     await user.click(screen.getByRole("button", { name: "Solicitar liberação" }));
 
-    expect(await screen.findByText(/Gasolina liberado na pump-01/)).toBeInTheDocument();
+    expect(await screen.findByText(/Trava de Gasolina liberada na pump-01/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Encerrar e bloquear agora" })).toBeEnabled();
   });
 
@@ -62,7 +62,7 @@ describe("fluxo seguro de autorização", () => {
     await user.type(screen.getByLabelText(/Justificativa/), "Veículo conferido no documento físico.");
     await user.click(screen.getByRole("button", { name: "Autorizar excepcionalmente" }));
 
-    expect(await screen.findByText(/Diesel S10 liberado na pump-01/)).toBeInTheDocument();
+    expect(await screen.findByText(/Trava de Diesel S10 liberada na pump-01/)).toBeInTheDocument();
   });
 
   it("não oferece override fora de REVIEW_REQUIRED", async () => {
@@ -73,7 +73,7 @@ describe("fluxo seguro de autorização", () => {
     expect(screen.queryByRole("radio", { name: /Diesel/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole("radio", { name: /Gasolina Compatível/ }));
     await user.click(screen.getByRole("button", { name: "Solicitar liberação" }));
-    expect(await screen.findByText(/Gasolina liberado/)).toBeInTheDocument();
+    expect(await screen.findByText(/Trava de Gasolina liberada/)).toBeInTheDocument();
     expect(screen.queryByText("Liberação excepcional")).not.toBeInTheDocument();
   });
 
@@ -145,7 +145,7 @@ describe("fluxo seguro de autorização", () => {
 
     await user.click(screen.getByRole("button", { name: "Verificar resultado com a mesma chave" }));
 
-    expect(await screen.findByText(/Gasolina liberado na pump-01/)).toBeInTheDocument();
+    expect(await screen.findByText(/Trava de Gasolina liberada na pump-01/)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(3);
     const reconciliationBody = JSON.parse(String(fetchMock.mock.calls[2][1]?.body));
     expect(reconciliationBody.client_request_id).toBe(originalBody.client_request_id);
@@ -262,7 +262,7 @@ describe("fluxo seguro de autorização", () => {
 
     await user.click(screen.getByRole("button", { name: "Verificar estado da autorização" }));
 
-    expect(await screen.findByText(/Gasolina liberado na pump-01/)).toBeInTheDocument();
+    expect(await screen.findByText(/Trava de Gasolina liberada na pump-01/)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(4);
     expect(fetchMock.mock.calls[3][1]?.method).toBe("GET");
   });

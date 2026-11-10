@@ -1,0 +1,14 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.1.2-alpine
+    container_name: tcc-mqtt-lab
+    restart: "no"
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h 127.0.0.1 -p 1883 -t '$$SYS/broker/version' -C 1 -W 3 >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 4s
+      retries: 5
