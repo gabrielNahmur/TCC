@@ -23,19 +23,22 @@ podem ser convertidos diretamente em prevalência para a organização estudada.
 
 Como possível barreira anterior à liberação, propõe-se consultar a placa do
 veículo em um serviço autorizado, transformar o código retornado em uma política
-explícita de compatibilidade e liberar temporariamente apenas o bico solicitado
-e compatível. O serviço Consulta Online SENATRAN disponibiliza código e descrição
+explícita de compatibilidade e autorizar temporariamente a abertura apenas da
+trava do suporte do bico solicitado e compatível. O serviço Consulta Online
+SENATRAN disponibiliza código e descrição
 do combustível na modalidade detalhada \cite{serproDadosVeiculo2026}. Entretanto,
 seu uso não se resume a uma chamada técnica: requer caso de uso aprovado,
 contratação do Serpro e de uma Gerenciadora de Consentimento e Ciência (GCC) e
 atendimento às condições de governança aplicáveis \cite{senatran1392025,serproComoContratar2026}.
 
 O artefato acadêmico será inicialmente construído em bancada seca, sem
-combustível e em baixa tensão. A trava física representa o intertravamento, mas
-não constitui solução pronta para instalação em uma bomba. Uma implantação real
-exigiria integração com o fabricante ou controlador de pista, classificação do
-local e equipamentos adequados à atmosfera potencialmente explosiva
-\cite{inmetro1152022,nr20}.
+combustível e em baixa tensão. A trava física independente será posicionada no
+suporte para impedir a retirada do bico sem autorização. O artefato não comanda
+bombeamento, vazão ou a automação de pista da empresa e não constitui solução
+pronta para instalação em campo. Uma implantação real desse intertravamento
+exigiria projeto de engenharia próprio, análise da área classificada,
+profissionais habilitados e equipamentos adequados à atmosfera potencialmente
+explosiva \cite{inmetro1152022,nr20}.
 
 \subsection{Problema e pergunta de pesquisa}
 
@@ -45,22 +48,22 @@ bico. A investigação é orientada pela seguinte pergunta:
 
 \begin{quote}
 \textit{Como um sistema baseado em consulta veicular e intertravamento pode
-impedir a liberação de combustíveis incompatíveis em ambiente controlado, e em
-quais condições sua adoção apresenta viabilidade econômica para uma rede de
-postos?}
+impedir a retirada do bico associado a um combustível incompatível em ambiente
+controlado, e em quais condições sua adoção apresenta viabilidade econômica
+para uma rede de postos?}
 \end{quote}
 
 Foram formuladas duas hipóteses verificáveis:
 
 \begin{itemize}
   \item \textbf{H1:} na matriz de testes de bancada, o sistema impedirá todas as
-  liberações incompatíveis e não liberará automaticamente nenhum bico diante de
-  resposta inválida, ambígua ou indisponível;
+  aberturas incompatíveis das travas e não autorizará automaticamente nenhum
+  suporte diante de resposta inválida, ambígua ou indisponível;
   \item \textbf{H2:} em pelo menos um dos cenários de sensibilidade, as perdas
   evitáveis estimadas superarão o custo anualizado da solução.
 \end{itemize}
 
-H1 somente será aceita se não houver liberação indevida nos casos definidos
+H1 somente será aceita se não houver abertura indevida nos casos definidos
 antes dos ensaios. H2 será avaliada por cenários, e não como economia observada.
 Ambas permanecem sem teste conclusivo nesta etapa.
 

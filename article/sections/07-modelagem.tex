@@ -10,7 +10,8 @@ A consulta começa em \path{QUERYING}. Produto incompatível conduz a
 \path{PENDING_DEVICE}. Somente o reconhecimento do comando promove a
 autorização para \path{AUTHORIZED}. Uma revisão excepcional permitida também
 passa por essa intenção, nunca diretamente para autorização. Expiração,
-conclusão, substituição ou falha retornam o dispositivo ao bloqueio.
+conclusão, substituição ou falha retornam as saídas comandadas ao estado seguro
+desenergizado; isso não recolhe fisicamente um bico que já esteja fora do suporte.
 
 \begin{figure}[H]
   \centering
@@ -43,24 +44,28 @@ conclusão, substituição ou falha retornam o dispositivo ao bloqueio.
   \fontepropria
 \end{figure}
 
-Estados terminais, expiração, substituição e falhas conduzem ao estado físico
-bloqueado; esses retornos foram omitidos da figura para preservar a
-legibilidade. A implementação atual persiste \path{PENDING_DEVICE},
+Estados terminais, expiração, substituição e falhas conduzem as saídas de
+abertura ao estado desenergizado; esses retornos foram omitidos da figura para
+preservar a legibilidade. Sem sensor de presença, esse comando não confirma a
+posição mecânica do bico. A implementação atual persiste \path{PENDING_DEVICE},
 \path{AUTHORIZED}, \path{DENIED}, \path{REVIEW_REQUIRED},
 \path{COMPLETED}, \path{EXPIRED} e \path{SUPERSEDED};
-\path{QUERYING}, \path{DISPENSING}, \path{LOCKED} e \path{CANCELLED}
+\path{QUERYING}, \path{LOCKED} e \path{CANCELLED}
 ainda não são estados de domínio materializados. Não existe transição de
 \path{DENIED}, \path{EXPIRED}, \path{COMPLETED} ou
 \path{SUPERSEDED} para \path{AUTHORIZED}. O override parte exclusivamente de
 \path{REVIEW_REQUIRED} e somente quando o motivo pertence às incertezas da
-consulta; falha de bomba, bico ou dispensador não pode ser contornada.
+consulta; falha do controlador, da trava ou do bico não pode ser contornada.
 
 Antes de enviar \path{UNLOCK}, o backend persiste a intenção e o identificador
-do comando. O gateway simulado aplica e confirma a operação de modo síncrono;
-então o backend registra o evento de ACK e promove a autorização. O firmware
-experimental já produz \path{COMMAND_ACK}, porém o backend ainda não consome
-esse evento por MQTT. Se o bloqueio compensatório falhar, a garantia residual é
-o TTL local do dispositivo, não um bloqueio imediato absoluto.
+do comando. O gateway simulado aplica e confirma a operação de modo síncrono.
+No modo MQTT, o adaptador publica o comando com QoS 1 e só confirma a operação
+depois de validar o \path{COMMAND_ACK} correspondente. Esse caminho foi testado
+com cliente MQTT falso, mas ainda não foi ensaiado com broker e ESP32 emulados
+ao vivo. O ACK confirma o processamento do comando e o estado lógico da GPIO;
+ele não comprova que o atuador se moveu nem que o bico foi retirado ou devolvido.
+Se o comando compensatório falhar, a garantia residual é o TTL local que
+desenergiza a saída, não um bloqueio mecânico imediato absoluto.
 
 \subsection{Tabela de decisão}
 
@@ -71,13 +76,13 @@ o TTL local do dispositivo, não um bloqueio imediato absoluto.
   \small
   \begin{tabularx}{\textwidth}{@{}L{2.4cm}L{2.7cm}L{2.4cm}Y@{}}
     \toprule
-    \textbf{Resposta} & \textbf{Produto solicitado} & \textbf{Decisão} & \textbf{Efeito físico} \\
+    \textbf{Resposta} & \textbf{Produto solicitado} & \textbf{Decisão} & \textbf{Efeito no suporte} \\
     \midrule
-    Válida e inequívoca & Compatível & Autorizar & Liberar apenas o bico solicitado por TTL. \\
-    Válida e inequívoca & Incompatível & Negar & Manter todos bloqueados. \\
-    Inválida ou ausente & Qualquer & Revisar & Manter bloqueado; permitir fluxo de supervisor. \\
-    Código desconhecido & Qualquer & Revisar & Manter bloqueado e registrar versão da política. \\
-    Válida com múltiplos & Um compatível & Autorizar & Liberar somente o produto escolhido, nunca todos. \\
+    Válida e inequívoca & Compatível & Autorizar & Energizar por TTL somente a abertura da trava solicitada. \\
+    Válida e inequívoca & Incompatível & Negar & Manter todas as saídas de abertura desenergizadas. \\
+    Inválida ou ausente & Qualquer & Revisar & Manter saídas desenergizadas; permitir fluxo de supervisor. \\
+    Código desconhecido & Qualquer & Revisar & Manter saídas desenergizadas e registrar versão da política. \\
+    Válida com múltiplos & Um compatível & Autorizar & Energizar somente a trava do produto escolhido, nunca todas. \\
     Conversão não comprovada & Qualquer & Revisar & Não inferir compatibilidade automaticamente. \\
     \bottomrule
   \end{tabularx}
@@ -95,8 +100,8 @@ persistidas para versão da política ou confirmação do dispositivo.
 
 A placa existe apenas em memória durante a consulta e não é chave de
 relacionamento persistente. O esquema atual guarda decisão, combustível
-solicitado, bomba, frentista, modo do provedor, motivo, horários e eventual
-override, além de \path{client_request_id} e um fingerprint HMAC para verificar
+solicitado, conjunto lógico de bicos, frentista, modo do provedor, motivo,
+horários e eventual override, além de \path{client_request_id} e um fingerprint HMAC para verificar
 idempotência. A consulta de compatibilidade usa cache temporário em memória,
 indexado por HMAC da placa normalizada, para evitar uma segunda consulta no
 mesmo fluxo. A chave HMAC fica fora do repositório; esse recurso reduz exposição,

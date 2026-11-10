@@ -5,15 +5,20 @@ A demonstração do seminário será reprodutível e utilizará somente dados
 sintéticos. O roteiro mínimo conterá:
 
 \begin{enumerate}
-  \item veículo compatível com gasolina e solicitação de gasolina, com liberação
-  de um único bico;
+  \item veículo compatível com gasolina e solicitação de gasolina, com
+  autorização de abertura somente da trava do suporte correspondente;
   \item veículo a diesel S10 e solicitação de gasolina, com negação;
   \item veículo flex, com escolha de um produto compatível sem liberar os demais;
   \item veículo não encontrado, código desconhecido e timeout, todos conduzidos
   a \path{REVIEW_REQUIRED};
   \item override de supervisor com justificativa e expiração curta;
+  \item tentativa de retirar um bico bloqueado na planta visual, com recusa;
+  \item retirada e devolução simuladas do bico autorizado, deixando explícito
+  que a posição existe apenas no navegador; e
   \item mensagem duplicada, comando vencido e perda de comunicação, sem segunda
-  liberação e com retorno a \path{LOCK_ALL}.
+  liberação e com retorno das saídas a \path{LOCK_ALL}. Se o bico estiver fora
+  no momento da falha, ele permanecerá fora na representação até a devolução
+  manual.
 \end{enumerate}
 
 Cada execução guardará identificador do cenário, versão do software e da

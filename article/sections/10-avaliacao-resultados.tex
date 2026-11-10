@@ -37,7 +37,7 @@ projeto preliminares}; ainda não constituem resultado experimental.
 
 Também foi produzido um primeiro incremento do artefato. O backend simulado
 implementa consulta de casos sintéticos, mapeamento de combustíveis, decisão,
-TTL, intenção persistida antes do comando, ACK síncrono do dispensador em
+TTL, intenção persistida antes do comando, ACK síncrono do intertravamento em
 memória, SQLite minimizado e override restrito a incertezas de
 \path{REVIEW_REQUIRED}. A idempotência por \path{client_request_id}, o
 fingerprint HMAC persistido e o cache HMAC temporário evitam, nos casos cobertos,
@@ -45,15 +45,20 @@ novo comando ou segunda consulta durante a reconciliação. A PWA implementa o
 fluxo operacional em modo demonstrativo ou conectado à API e trata resposta
 perdida como estado desconhecido até reconciliação manual. O firmware
 experimental implementa a lógica local de TTL, sequência e idempotência.
+Nesse estágio, o ACK demonstra processamento do comando e estado lógico da
+saída GPIO; não demonstra movimento do atuador nem posição mecânica do bico. A
+posição mostrada na planta React é simulada no navegador, pois a bancada atual
+não possui microswitch ou sensor Hall.
 
-Em execução local de 29 de julho de 2026, os 82 testes automatizados do backend
-foram aprovados e a ferramenta de cobertura reportou 93\% das instruções. Os
-12 testes da PWA também foram aprovados, sua compilação de produção foi
+Em execução local de 31 de julho de 2026, os 95 testes automatizados do backend
+foram aprovados e a ferramenta de cobertura reportou 90\% das instruções. Os
+24 testes da PWA também foram aprovados, sua compilação de produção foi
 concluída, o executável de teste da lógica C++ do firmware terminou sem falha e
-o alvo \path{esp32dev} foi compilado com PlatformIO.
+o alvo PICSimLab foi compilado com PlatformIO e seu workspace foi carregado no
+simulador como ESP32-DevKitC.
 Esse resultado é reprodutível pelos comandos documentados no repositório, mas
 se limita a componentes de software. Não houve teste ponta a ponta entre PWA,
-backend, broker e ESP32, gravação/execução em placa nem ensaio com bancada física.
+backend, broker e ESP32 emulado, gravação/execução em placa nem ensaio com bancada física.
 
 \subsection{Resultados ainda não disponíveis}
 
@@ -70,8 +75,8 @@ backend, broker e ESP32, gravação/execução em placa nem ensaio com bancada f
     Total de abastecimentos compatível & Calcular taxa, se houver cobertura equivalente & Não coletado \\
     Entrevistas autorizadas & Refinar processo, requisitos e modos de falha & Não realizadas \\
     Matriz integral de H1 & Testar decisões, falhas e bloqueio em todos os casos predefinidos & Parcial: testes de componentes \\
-    Integração MQTT/ESP32 & Confirmar comando, sessão, TTL e retorno ao bloqueio & Não executada \\
-    Ciclos da bancada & Testar repetibilidade e intertravamento físico & Não executados \\
+    Integração MQTT/ESP32 & Confirmar comando, sessão, TTL e desenergização das saídas & Não executada \\
+    Ciclos da bancada & Testar repetibilidade, movimento da trava e presença do bico & Não executados \\
     Medidas de latência/usabilidade & Avaliar desempenho e interação & Não coletadas \\
     Custos da solução & Calcular $C_{\mathrm{sol}}$ & Incompletos \\
     \bottomrule
@@ -85,9 +90,11 @@ retorno financeiro ou adequação para operação real.
 
 \subsection{Critérios de aceitação}
 
-H1 exigirá zero liberação incompatível em todos os casos predefinidos, zero
-liberação automática diante de resposta inválida, ambígua ou indisponível e
-retorno ao bloqueio após expiração, término ou falha. Serão incluídos gasolina,
+H1 exigirá zero abertura incompatível de trava em todos os casos predefinidos,
+zero autorização automática diante de resposta inválida, ambígua ou indisponível e
+retorno das saídas ao estado desenergizado após expiração, término ou falha. A
+confirmação do bloqueio mecânico será registrada separadamente e dependerá do
+ensaio físico. Serão incluídos gasolina,
 etanol, flex, diesel S10, diesel S500, diesel sem especificação inequívoca,
 híbrido, elétrico, conversão não comprovada, veículo não encontrado e provedor
 indisponível. A quantidade de repetições será definida com

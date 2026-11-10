@@ -72,7 +72,9 @@ Vehicle misfuelling can generate operational disruption and repair costs, while
 the prevention of the error depends on barriers that act before fuel delivery.
 This ongoing study aims to design, implement and evaluate a bench prototype
 that combines vehicle-data querying, a fuel-compatibility policy and nozzle
-interlocking. The research follows Design Science Research and a case study in
+interlocking through an independent lock at the nozzle holder. The artifact
+does not command fuel pumping or the company's forecourt automation. The
+research follows Design Science Research and a case study in
 an anonymized fuel-station network. The planned evaluation covers functional
 safety, fault handling, latency, usability and an economic sensitivity
 analysis. Preliminary documentary analysis identified that fuel code and
@@ -80,8 +82,8 @@ description belong to the detailed vehicle query of the Brazilian National
 Traffic Secretariat and that access depends on authorization and contracts with
 the federal service provider and a consent-management company. A simulated
 FastAPI backend, a React progressive web application and experimental ESP32
-firmware were also produced. On 29 July 2026, local verification passed 82
-backend tests with 93\% statement coverage, 12 interface tests, a
+firmware were also produced. On 31 July 2026, local verification passed 95
+backend tests with 90\% statement coverage, 24 interface tests, a
 host-side test of the firmware interlocking logic and a successful PlatformIO
 build for the \path{esp32dev} target. These results cover separate software
 components only: there has been no end-to-end MQTT test, firmware upload to an
@@ -98,7 +100,9 @@ transtornos operacionais e custos de reparação, enquanto sua prevenção exige
 barreiras que atuem antes da liberação do produto. Este trabalho em andamento
 objetiva projetar, implementar e avaliar, em bancada, um protótipo que combine
 consulta de dados veiculares, política de compatibilidade e intertravamento de
-bicos. A pesquisa adota a metodologia \textit{Design Science Research} e um
+bicos por uma trava independente no suporte. O artefato não comanda
+bombeamento nem a automação de pista da empresa. A pesquisa adota a metodologia
+\textit{Design Science Research} e um
 estudo de caso em uma rede de postos anonimizada. A avaliação planejada abrange
 segurança funcional, tratamento de falhas, latência, usabilidade e análise
 econômica por cenários. Como resultados parciais, a análise documental
@@ -107,12 +111,13 @@ detalhada da Secretaria Nacional de Trânsito e que o acesso depende de
 autorização e de contratos com o provedor federal e uma gerenciadora de
 consentimento e ciência. Também foram produzidos um backend simulado em
 FastAPI, uma PWA em React e um firmware experimental para ESP32. Em verificação
-local de 29 de julho de 2026, passaram 82 testes do backend, com 93\% de
-cobertura de instruções, 12 testes da interface, o teste, em computador,
+local de 31 de julho de 2026, passaram 95 testes do backend, com 90\% de
+cobertura de instruções, 24 testes da interface, o teste, em computador,
 da lógica de intertravamento do firmware e a compilação PlatformIO para o alvo
-\path{esp32dev}. Esses resultados abrangem componentes de software isolados:
-ainda não houve teste ponta a ponta por MQTT, gravação e execução em uma placa
-ESP32 ou ensaio físico de bancada. Dados históricos e entrevistas
+PICSimLab. Também foram produzidos o adaptador MQTT, a bancada visual da PWA e
+um workspace carregável no PICSimLab. Esses resultados abrangem componentes de
+software isolados: ainda não houve teste ponta a ponta pelo broker, gravação e
+execução em uma placa ESP32 ou ensaio físico de bancada. Dados históricos e entrevistas
 também estão pendentes; por isso, nenhuma das hipóteses foi integralmente
 testada.
 

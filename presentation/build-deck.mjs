@@ -24,7 +24,7 @@ const WHITE = "#FFFFFF";
 const MUTED = "#4B5563";
 const FONT = "Arial";
 
-const ROOT = "C:\\Users\\confi\\OneDrive - GBI COMBUSTIVEIS LTDA\\Documentos\\TCC";
+const ROOT = ".";
 
 // Os módulos exatos da biblioteca Codex Grid declaram largura e altura ao lado
 // de `position`. Este adaptador também aceita a forma compacta usada neste
@@ -113,7 +113,7 @@ function addNotes(slide, body, sources) {
     body.trim(),
     "",
     "[Sources]",
-    ...sources.map((source) => `- ${source}`),
+    ...sources.map((source) => `- ${source.replaceAll("\\", "/")}`),
   ].join("\n");
   slide.speakerNotes.textFrame.setText(notes);
   slide.speakerNotes.setVisible(true);
@@ -317,7 +317,7 @@ function addQuestionSlide(presentation) {
       text(
         [
           p("PERGUNTA DE PESQUISA", 18, { bold: true, color: ACCENT_STRONG, spaceAfter: 700 }),
-          p("Como um sistema baseado em consulta veicular e intertravamento pode impedir a liberação de combustíveis incompatíveis em ambiente controlado, e em quais condições sua adoção apresenta viabilidade econômica para uma rede de postos?", 22, { bold: true, lineSpacingPercent: 112000 }),
+          p("Como um sistema baseado em consulta veicular e intertravamento pode impedir a retirada do bico associado a um combustível incompatível em ambiente controlado, e em quais condições sua adoção apresenta viabilidade econômica para uma rede de postos?", 22, { bold: true, lineSpacingPercent: 112000 }),
         ],
         {
           name: "research-question",
@@ -336,7 +336,7 @@ function addQuestionSlide(presentation) {
       ),
       shape({ name: "h1-panel", geometry: "rect", fill: PANEL, position: { left: 42, top: 360, width: 580, height: 238 } }),
       shape({ name: "h2-panel", geometry: "rect", fill: PANEL, position: { left: 658, top: 360, width: 580, height: 238 } }),
-      text(bodyBlock("H1 · segurança", "Na matriz de bancada, impedir todas as liberações incompatíveis e nunca liberar automaticamente diante de resposta inválida, ambígua ou indisponível."), {
+      text(bodyBlock("H1 · segurança", "Na matriz de bancada, impedir todas as aberturas incompatíveis das travas e nunca autorizar automaticamente uma trava diante de resposta inválida, ambígua ou indisponível."), {
         name: "h1-text",
         position: { left: 78, top: 394 },
         width: 508,
@@ -510,14 +510,14 @@ function addMethodSlide(presentation) {
 
 function addFlowSlide(presentation) {
   const rows = [
-    ["01", "Frentista informa placa, produto solicitado, bomba e identificação operacional."],
+    ["01", "Frentista informa placa, produto solicitado, identificador lógico do conjunto e identificação operacional."],
     ["02", "Backend consulta provedor sintético ou autorizado e normaliza combustíveis compatíveis."],
     ["03", "Produto solicitado é comparado à lista compatível; códigos desconhecidos exigem revisão."],
-    ["04", "Somente um bico recebe autorização temporária, identificada e confirmada pelo dispositivo."],
-    ["05", "Resposta inválida, ambígua ou indisponível conduz a REVIEW_REQUIRED, sem liberação automática."],
-    ["06", "Encerramento, expiração ou perda de comunicação executa LOCK_ALL."],
+    ["04", "Somente uma trava recebe autorização temporária; o ACK confirma comando e GPIO, não movimento mecânico."],
+    ["05", "Resposta inválida, ambígua ou indisponível conduz a REVIEW_REQUIRED, sem abertura automática."],
+    ["06", "Encerramento, expiração ou perda de comunicação executa LOCK_ALL; bico fora exige devolução manual."],
   ];
-  const nodes = [titleNode("O fluxo autoriza um único bico e sempre retorna ao estado bloqueado")];
+  const nodes = [titleNode("O fluxo autoriza uma única trava; falhas desenergizam todas as saídas")];
   rows.forEach(([index, label], i) => {
     const top = 148 + i * 78;
     nodes.push(
@@ -552,7 +552,7 @@ function addArchitectureSlide(presentation) {
   const columns = [
     [42, "INTERAÇÃO", "React/PWA\n\nEntrada de placa e produto\n\nExibe decisão e exige reconciliação quando o resultado físico é desconhecido", "Sem credenciais no tablet"],
     [452, "DECISÃO", "FastAPI + PostgreSQL/SQLite no protótipo\n\nVehicleDataProvider\n\nRegras de compatibilidade, auditoria e override", "Placa não segue ao dispositivo"],
-    [864, "DISPOSITIVO", "DispenserGateway + MQTT\n\nESP32 na bancada\n\nLOCK_ALL ou UNLOCK(nozzle_id, ttl)", "ACK + sequência + expiração"],
+    [864, "INTERTRAVAMENTO", "Gateway de trava + MQTT\n\nESP32 na bancada\n\nLOCK_ALL ou UNLOCK(nozzle_id, ttl)", "Atua no suporte; não bombeia"],
   ];
   const nodes = [titleNode("A decisão fica no backend; o dispositivo recebe apenas comandos mínimos")];
   // Conectores primeiro, atrás dos nós.
@@ -584,7 +584,7 @@ function addArchitectureSlide(presentation) {
     presentation,
     8,
     nodes,
-    "Explicar o desacoplamento por adaptadores. O ESP32 é um controlador de bancada, não um controlador industrial de pista. Em implantação real, componentes próximos ao abastecimento exigem análise de área classificada e conformidade aplicável.",
+    "Explicar o desacoplamento por adaptadores. O ESP32 controla somente a trava independente do suporte na bancada; não comanda bombeamento nem integra a automação da empresa. Em implantação real, componentes próximos ao abastecimento exigem análise de área classificada e conformidade aplicável.",
     [
       `${ROOT}\\research\\architecture\\arquitetura.md`,
       `${ROOT}\\prototype\\backend\\README.md`,
@@ -597,9 +597,9 @@ function addArchitectureSlide(presentation) {
 
 function addResultsSlide(presentation) {
   const cards = [
-    [42, "82/82", "testes do backend", "93,26% de cobertura"],
-    [452, "12/12", "testes da PWA", "build e auditoria concluídos"],
-    [864, "2 builds", "firmware", "host + PlatformIO/ESP32"],
+    [42, "95/95", "testes do backend", "90% de cobertura"],
+    [452, "24/24", "testes da PWA", "build e auditoria concluídos"],
+    [864, "3 artefatos", "bancada digital", "planta PWA + firmware + PICSimLab"],
   ];
   const nodes = [
     titleNode("Os resultados parciais confirmam o software — não a bancada física"),
@@ -631,7 +631,7 @@ function addResultsSlide(presentation) {
     );
   });
   nodes.push(
-    text([p("Também entregues: artigo LaTeX, protocolos, arquitetura, matriz de cenários e modelo econômico vazio.", 18, { color: MUTED })], {
+    text([p("Também entregues: adaptador MQTT, workspace PICSimLab, protocolos, matriz de cenários e modelo econômico vazio.", 18, { color: MUTED })], {
       name: "results-artifacts",
       position: { left: 42, top: 564 },
       width: 1196,
@@ -650,7 +650,7 @@ function addResultsSlide(presentation) {
     presentation,
     9,
     nodes,
-    "Apresentar somente resultados reproduzíveis desta versão. O backend tem 82 testes aprovados e 93,26% de cobertura; a PWA tem 12 testes aprovados; o firmware compila no host e no alvo esp32dev. Não chamar isso de validação física.",
+    "Apresentar somente resultados reproduzíveis desta versão. O backend tem 95 testes aprovados e 90% de cobertura; a PWA tem 24 testes aprovados, incluindo retirada, devolução e falhas na planta visual; o firmware compila no host e no alvo PICSimLab, cujo workspace foi carregado. A integração MQTT ao vivo ainda precisa ser verificada nesta execução. Não chamar isso de validação física.",
     [
       `${ROOT}\\article\\sections\\08-implementacao.tex`,
       `${ROOT}\\article\\sections\\10-avaliacao-resultados.tex`,

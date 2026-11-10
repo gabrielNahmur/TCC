@@ -8,6 +8,12 @@ o bloqueio, mas não demonstram aptidão industrial. A consulta real depende de
 aprovação externa, contratos e documentação técnica ainda não disponíveis; por
 isso, o simulador é a fonte padrão do desenvolvimento.
 
+A posição dos bicos exibida na planta React é simulada no navegador. O ACK do
+ESP32 informa processamento do comando e estado lógico da saída GPIO, não
+deslocamento do solenoide, posição do pino ou presença do bico no suporte. Como
+a bancada atual não possui microswitch nem sensor Hall, desenergizar uma saída
+com o bico já retirado não o devolve nem comprova novo bloqueio mecânico.
+
 O MVP de software também é restrito ao próprio computador. Identidades de
 frentista e supervisor são autodeclaradas, e o token de supervisor é global;
 portanto, os testes atuais não demonstram autenticação individual, segregação de
@@ -22,6 +28,10 @@ na coleta e interpretação. A análise econômica será contrafactual e sensív
 volume de consultas, tarifa da GCC, vida útil e percentual de prevenção. Mesmo
 que H1 seja atendida em bancada, isso não comprovará eficácia, segurança ou
 conformidade em uma instalação real.
+
+O projeto limita-se a uma trava independente no suporte do bico. Não foram
+modelados nem avaliados comando de bombeamento, controle de vazão, integração
+com controlador de pista ou alterações na automação da empresa.
 
 Por fim, a descrição de combustível no cadastro veicular pode não representar
 alterações posteriores, conversões ou particularidades não cobertas pela

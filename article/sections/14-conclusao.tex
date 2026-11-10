@@ -2,7 +2,7 @@
 \label{sec:conclusao}
 
 Este trabalho em andamento estruturou uma investigação aplicada para prevenir a
-liberação de combustível incompatível antes do abastecimento. A pergunta,
+retirada do bico associado a combustível incompatível antes do abastecimento. A pergunta,
 hipóteses e objetivos foram convertidos em um método que combina DSRM,
 mapeamento da literatura e estudo de caso, além de requisitos, arquitetura,
 estados e critérios de aceitação rastreáveis.
@@ -12,16 +12,19 @@ consulta detalhada de veículo e que o acesso envolve autorização SENATRAN,
 Serpro e GCC. Também corrigiu a premissa de preço: R\$~0{,}80 não é o valor da
 primeira faixa da consulta detalhada na Portaria n\textsuperscript{o} 417/2026. As restrições de
 segurança levaram a manter o ESP32 e os atuadores comuns exclusivamente em
-bancada seca e a considerar controladores certificados como caminho para uma
-eventual aplicação industrial.
+bancada seca. O escopo físico foi fixado como uma trava independente no suporte
+do bico, sem comando de bombeamento ou integração com a automação de pista. Uma
+eventual aplicação de campo dependeria de projeto próprio e componentes
+certificados para a classificação do local.
 
 O primeiro incremento de software materializou backend, PWA e firmware
-experimental em modo sintético. A verificação local aprovou 82 testes do
-backend, com 93\% de cobertura de instruções, 12 testes da interface, a
+experimental em modo sintético. A verificação local aprovou 95 testes do
+backend, com 90\% de cobertura de instruções, 24 testes da interface, a
 compilação de produção da PWA, o teste em computador da lógica de
-intertravamento do firmware e o build PlatformIO para o alvo \path{esp32dev}.
-Esses resultados não incluem integração MQTT, gravação/execução em placa ou
-ensaio físico.
+intertravamento do firmware e o build PlatformIO/workspace do PICSimLab. O
+adaptador MQTT e a bancada visual foram implementados e testados isoladamente.
+Esses resultados não incluem integração MQTT ao vivo, gravação/execução em placa
+ou ensaio físico.
 
 Ainda não há base para concluir que o sistema reduz incidentes ou é
 economicamente viável. Dados da empresa, entrevistas, matriz integral de

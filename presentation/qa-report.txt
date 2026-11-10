@@ -1,24 +1,45 @@
-QA da apresentação — 29/07/2026
+QA da apresentação — 31/07/2026
 
 Artefato: seminario-andamento.pptx
 Fonte: build-deck.mjs (@oai/artifact-tool)
 Quantidade: 12 lâminas
 
-1. Renderização integral
-- render_slides.py produziu slide-1.png a slide-12.png.
-- O processo Node do runtime Windows encerrou após imprimir o JSON com os 12 caminhos; os arquivos foram gerados corretamente.
+1. Atualização factual e de escopo
+- Slide 3 usa a pergunta de pesquisa e H1 em termos de retirada do bico e
+  abertura da trava, sem sugerir comando de bombeamento.
+- Slide 7 distingue autorização lógica, ACK de comando/GPIO e movimento
+  mecânico; LOCK_ALL desenergiza as saídas e não recolhe um bico já retirado.
+- Slide 8 descreve uma trava física independente no suporte do bico.
+- Slide 9 registra 95/95 testes do backend, 90% de cobertura e 24/24 testes da
+  PWA; H1 e H2 continuam abertas.
 
-2. Inspeção visual
-- As 12 lâminas foram abertas e inspecionadas individualmente em resolução integral.
-- Não foram observados clipping, sobreposição não intencional, título truncado, placeholder, conector atravessando rótulo ou conteúdo fora do canvas.
+2. Renderização e inspeção visual
+- render_slides.py produziu slide-1.png a slide-12.png a partir do PPTX atual.
+- O processo Node do runtime Windows encerrou com código 1 depois de imprimir o
+  JSON com os 12 caminhos; os 12 arquivos foram produzidos e validados.
+- As 12 lâminas foram inspecionadas no mosaico; slides 3, 7 e 9 também foram
+  inspecionados em resolução integral.
+- Não foram observados clipping, sobreposição não intencional, título truncado,
+  placeholder, conector atravessando rótulo ou conteúdo fora do canvas.
 
 3. Teste de overflow
-- slides_test.py ampliou o deck com 100 px de margem cinza e gerou os 12 renders de teste.
-- Como o mesmo encerramento do processo Node ocorreu depois da renderização, a etapa final foi executada diretamente com a função slides_test.inspect_images, mantendo DPI 120, margem de 100 px, tolerância e razão de padding do utilitário.
+- O deck ampliado com 100 px de margem cinza gerou 12 renders a 120 DPI.
+- slides_test.inspect_images foi executado com os parâmetros calculados pelo
+  utilitário.
 - Resultado: overflow_slides = [] (0 de 12).
 
 4. Inspeção estrutural
 - 140 objetos com bbox inspecionados; 0 fora de 1280 x 720.
 - 12 de 12 lâminas contêm notas do apresentador.
 - 12 de 12 notas contêm a seção [Sources].
-- Nenhum texto de exemplo (Lorem ipsum, Title here, Supertitle, Thank you) permaneceu no deck.
+
+5. Verificação dos artefatos citados
+- Backend: 95/95 testes, 90% de cobertura de instruções.
+- PWA: 24/24 testes, TypeScript/Vite build aprovado e npm audit sem achados.
+- Firmware: teste C++ host aprovado e PlatformIO/PICSimLab compilado com 13,8%
+  de RAM e 59,2% de flash.
+
+6. Limite desta execução
+- A cadeia MQTT/PICSimLab ao vivo não foi executada: Docker Desktop, broker e
+  PICSimLab não estavam ativos, e o workspace PICSimLab existente antecede o
+  firmware que publica EMERGENCY_STOP_RELEASED.

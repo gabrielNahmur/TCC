@@ -6,7 +6,9 @@ PWA não acessa SENATRAN ou dispositivo diretamente. O backend consulta um
 \textit{VehicleDataProvider}, entrega apenas categorias normalizadas ao motor de
 política e, se autorizado, envia ao \textit{DispenserGateway} um comando sem
 placa ou conteúdo da resposta veicular. A Figura~\ref{fig:arquitetura} apresenta
-essa organização.
+essa organização. Apesar do nome preservado na interface do código, esse
+gateway comanda somente a trava independente do suporte do bico; não aciona
+dispensador, vazão, bomba ou automação de pista.
 
 \begin{figure}[H]
   \centering
@@ -22,8 +24,8 @@ essa organização.
     \node[bloco, right=of api] (policy) {Política de\\compatibilidade};
     \node[bloco, below=of api] (audit) {Auditoria\\minimizada};
     \node[externo, above=of policy] (provider) {Provedor veicular\\simulado/\\autorizado};
-    \node[bloco, right=of policy] (gateway) {Gateway do\\dispensador};
-    \node[externo, right=of gateway] (device) {Simulador ou\\ESP32 de bancada};
+    \node[bloco, right=of policy] (gateway) {Gateway de\\intertravamento};
+    \node[externo, right=of gateway] (device) {Simulador ou\\ESP32 e trava\\de bancada};
 
     \draw[seta] (ui) -- (api);
     \draw[seta] (api) -- (provider);
@@ -43,7 +45,9 @@ essa organização.
 
 A operação principal já é exposta pelo backend simulado como
 \texttt{POST} \path{/api/v1/authorizations}, recebendo placa, combustível solicitado,
-identificador do frentista, bomba e um UUID \path{client_request_id}. Repetir a
+identificador do frentista, conjunto lógico de bicos em \path{pump_id} e um UUID
+\path{client_request_id}. Esse campo agrupa concorrência e autorização, sem
+comandar a bomba. Repetir a
 mesma chave com o mesmo corpo retorna a decisão persistida sem novo comando; a
 reutilização com conteúdo diferente retorna conflito. A resposta tem estado,
 identificador da autorização, categorias compatíveis, código de motivo e
@@ -57,15 +61,18 @@ do dispositivo aceitará somente
 \path{LOCK_ALL} ou \path{UNLOCK(nozzle_id,ttl)}, acompanhados de
 \path{command_id}, sequência monotônica, sessão, horário de emissão e
 expiração, conforme o tipo da operação. Cada comando produzirá confirmação
-associada ao mesmo identificador e à mesma sequência.
+associada ao mesmo identificador e à mesma sequência. Essa confirmação atesta o
+processamento do comando e o estado lógico da saída GPIO, não o deslocamento do
+atuador nem a posição mecânica do bico.
 
 \subsection{Decisões tecnológicas}
 
 O incremento atual utiliza Python/FastAPI no backend, React na PWA e SQLite para
-persistência local minimizada. Um gateway em memória representa o dispensador.
-Há firmware experimental que implementa o contrato MQTT para ESP32, mas ele
-ainda não está integrado ao backend. PostgreSQL e contêineres permanecem opções
-para uma etapa posterior, não componentes já empregados. Essas escolhas são
+persistência local minimizada. O intertravamento pode ser representado por um
+gateway em memória ou pelo adaptador MQTT, que aguarda um ACK coerente do ESP32. Há
+firmware experimental, workspace PICSimLab e uma composição local do broker
+Mosquitto; a integração viva entre eles ainda não foi executada. PostgreSQL
+permanece opção para uma etapa posterior. Essas escolhas são
 substituíveis: as regras de compatibilidade permanecem no domínio, e integrações
 são isoladas pelas interfaces \path{VehicleDataProvider} e
 \path{DispenserGateway}.
@@ -76,13 +83,12 @@ externa. Essa barreira evita uso acidental de dados ou credenciais antes da
 autorização formal.
 
 O ESP32 é o controlador inicialmente recomendado para a bancada, acionando LEDs
-e, após revisão do orientador, servo ou solenoide de baixa tensão. Um Raspberry
-Pi poderá atuar como gateway local, mas não como mecanismo único de segurança.
-Para campo, a alternativa prioritária a estudar é integração com controlador de
-pista ou dispenser certificado. A documentação do Fuel Point PLUS, por exemplo,
-descreve identificação veículo-bico, consulta a servidor de autorização e
-abertura da bomba somente depois da aprovação \cite{gilbarcoFuelPoint2018}; ela
-serve como referência de arquitetura comercial, não como validação do protótipo.
+e, após revisão do orientador, um driver/MOSFET e solenoide de baixa tensão que
+representam o pino da trava no suporte. Um Raspberry Pi poderá atuar como
+gateway local, mas não como mecanismo único de segurança. A PWA representa a
+posição dos bicos apenas como simulação local no navegador. Microswitch ou
+sensor Hall por suporte poderá ser avaliado em trabalho futuro para fornecer
+telemetria de presença, mas não integra a bancada atual.
 
 \subsection{Disponibilidade e falhas}
 
@@ -91,10 +97,14 @@ se a resposta não puder ser mapeada de maneira inequívoca, a decisão automát
 será \path{REVIEW_REQUIRED}. A organização deverá definir um procedimento
 manual seguro para continuidade operacional; o protótipo apenas registrará o
 override autorizado. Perda de comunicação depois da liberação fará o
-controlador bloquear localmente após o TTL, independentemente do backend.
+controlador desenergizar a saída de abertura após o TTL, independentemente do
+backend. Se o bico já estiver fora do suporte, isso não causa retorno físico
+automático; a interface deverá indicar a necessidade de devolução.
 
 Se a PWA perder a resposta de criação, ela não presume bloqueio e não cria outra
 solicitação automaticamente: a reconciliação manual repete exatamente a mesma
 chave e o mesmo corpo. Se a resposta de override ou conclusão se perder, a
 interface consulta o estado pelo identificador já conhecido, sem repetir o
 comando físico. \path{PENDING_DEVICE} é tratado como estado físico desconhecido.
+Esse estado desconhecido não deve ser apresentado como confirmação de bloqueio
+mecânico.

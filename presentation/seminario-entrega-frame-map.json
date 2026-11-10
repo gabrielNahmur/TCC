@@ -1,0 +1,18 @@
+{
+  "outputSlides": [
+    { "outputSlide": 1, "sourceSlide": 1, "narrativeRole": "abertura e identificação", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 2, "sourceSlide": 2, "narrativeRole": "contextualização e relevância", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 3, "sourceSlide": 3, "narrativeRole": "pergunta e hipóteses", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 4, "sourceSlide": 4, "narrativeRole": "objetivos", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 5, "sourceSlide": 5, "narrativeRole": "referencial teórico e revisão de literatura", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 6, "sourceSlide": 6, "narrativeRole": "metodologia parcial", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 7, "sourceSlide": 7, "narrativeRole": "documento de análise funcional", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 8, "sourceSlide": 8, "narrativeRole": "documento de projeto e arquitetura", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 9, "sourceSlide": 11, "narrativeRole": "cronograma e estimativa de término", "reuseMode": "duplicate-slide", "editTargets": [] },
+    { "outputSlide": 10, "sourceSlide": 12, "narrativeRole": "síntese e próximos marcos", "reuseMode": "duplicate-slide", "editTargets": [] }
+  ],
+  "omittedSourceSlides": [
+    { "sourceSlide": 9, "reason": "resultados parciais não fazem parte do recorte mínimo informado pelo usuário" },
+    { "sourceSlide": 10, "reason": "análise econômica detalhada não faz parte do recorte mínimo informado pelo usuário" }
+  ]
+}

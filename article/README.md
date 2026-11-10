@@ -1,7 +1,19 @@
 # Artigo do TCC
 
-Base LaTeX para o Seminário de Andamento do TADS/IFSul, Câmpus Bagé. O projeto
-usa o estilo divulgado no template institucional, derivado do modelo SBC.
+Base LaTeX do TCC de TADS/IFSul, Câmpus Bagé. O projeto usa o estilo divulgado
+no template institucional, derivado do modelo SBC.
+
+## Documentos principais
+
+- `main.tex`: manuscrito completo do TCC.
+- `seminario-andamento.tex`: recorte específico do Seminário de Andamento,
+  contendo contextualização, objetivos, referencial teórico, revisão de
+  literatura, metodologia parcial, documentos de análise e projeto e
+  cronograma.
+- `../output/pdf/seminario-andamento.pdf`: PDF compilado para entrega e revisão.
+
+Os dois documentos reutilizam as mesmas seções, metadados e referências. Assim,
+correções feitas nas seções do artigo permanecem sincronizadas com o seminário.
 
 ## Antes de enviar
 
@@ -16,21 +28,23 @@ usa o estilo divulgado no template institucional, derivado do modelo SBC.
 
 ## Compilação
 
-No Overleaf, defina `main.tex` como documento principal. Localmente, com uma
-distribuição TeX instalada:
+No Overleaf, selecione `main.tex` para o artigo completo ou
+`seminario-andamento.tex` para o documento do seminário.
+
+Com uma distribuição TeX local:
 
 ```powershell
-latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error seminario-andamento.tex
 ```
 
 Alternativa manual:
 
 ```powershell
-pdflatex -interaction=nonstopmode -halt-on-error main.tex
-bibtex main
-pdflatex -interaction=nonstopmode -halt-on-error main.tex
-pdflatex -interaction=nonstopmode -halt-on-error main.tex
+pdflatex -interaction=nonstopmode -halt-on-error seminario-andamento.tex
+bibtex seminario-andamento
+pdflatex -interaction=nonstopmode -halt-on-error seminario-andamento.tex
+pdflatex -interaction=nonstopmode -halt-on-error seminario-andamento.tex
 ```
 
-O PDF é artefato de compilação. Os arquivos-fonte LaTeX e BibTeX constituem a
-fonte oficial versionada.
+Os arquivos-fonte LaTeX e BibTeX são a fonte oficial versionada; o PDF é o
+artefato compilado.

@@ -1,7 +1,7 @@
 \section{Implementação}
 \label{sec:implementacao}
 
-Esta seção registra o estado observado no repositório em 29 de julho de 2026,
+Esta seção registra o estado observado no repositório em 31 de julho de 2026,
 sem apresentar componentes inexistentes como concluídos. O repositório está
 dividido em artigo, pesquisa e protótipo. No protótipo, o backend concentra
 regras e casos de uso; a PWA consome a API ou executa um modo demonstrativo
@@ -10,11 +10,13 @@ sintético; e integrações externas respeitam as interfaces
 
 O backend FastAPI já recebe casos sintéticos, normaliza combustíveis, avalia a
 compatibilidade, registra decisões e eventos minimizados em SQLite e aciona um
-dispensador em memória. Antes de \path{UNLOCK}, a intenção
+intertravamento em memória ou o adaptador MQTT configurável. Antes de
+\path{UNLOCK}, a intenção
 \path{PENDING_DEVICE} e o identificador do comando são persistidos; o ACK
 síncrono do gateway simulado promove o estado para \path{AUTHORIZED}. Na
 conclusão ou expiração, o backend tenta \path{LOCK_ALL}; se essa confirmação
-falhar, o TTL local limita a liberação residual. O override é limitado a motivos
+falhar, o TTL local limita o tempo em que a saída de abertura pode permanecer
+energizada. O override é limitado a motivos
 específicos de \path{REVIEW_REQUIRED}; \path{DENIED}, falha do dispositivo e
 estado expirado não podem ser reativados. A proteção atual usa token Bearer
 compartilhado, não autenticação individual.
@@ -29,12 +31,22 @@ individual, RBAC, TLS ou gestão de sessão.
 
 A PWA em React implementa os fluxos de placa, seleção, decisão, contagem de TTL,
 conclusão, revisão de supervisor e reconciliação manual após resposta perdida,
-sem repetir automaticamente comandos cujo efeito físico seja desconhecido. O
+sem repetir automaticamente comandos cujo efeito físico seja desconhecido. Uma
+tela adicional representa uma bomba cenográfica, cinco mangueiras e bicos em
+seus suportes, as travas, os GPIOs, o TTL e os eventos do gateway, distinguindo
+simulação visual, gateway Python e transporte MQTT. A posição do bico nessa
+planta é um estado local do navegador, não uma leitura de sensor. Se a
+autorização expirar com o bico fora do suporte, a tela preserva sua posição e
+solicita devolução, sem simular retorno automático. O
 firmware experimental contém contrato MQTT,
 cinco saídas distintas, sessão de inicialização, sequência monotônica persistida,
-TTL local, rejeição de duplicatas e lógica desenergizada-igual-a-bloqueada.
-Entretanto, o backend ainda utiliza apenas o gateway em memória: não há
-integração MQTT ponta a ponta, placa ESP32 programada ou atuador físico ensaiado.
+TTL local, rejeição de duplicatas e desenergização das saídas como comando
+seguro.
+O backend possui o adaptador correspondente e valida ACKs com sessão, sequência,
+estado e bico coerentes. O ACK confirma o comando e o estado lógico da GPIO,
+mas, sem microswitch ou sensor Hall, não confirma movimento do atuador nem
+presença do bico no suporte. Não houve, porém, integração MQTT ponta a ponta, placa
+ESP32 programada ou atuador físico ensaiado.
 O modo SENATRAN é deliberadamente recusado na inicialização e não realiza
 chamada externa.
 
@@ -52,7 +64,7 @@ chamada externa.
     Domínio e simuladores & Decisões reproduzíveis e bloqueio após término, expiração ou falha & Implementado no backend simulado \\
     API e persistência & Contratos, idempotência, auditoria minimizada e testes automatizados & FastAPI e SQLite implementados \\
     PWA e autenticação & Fluxos de frentista e supervisor utilizáveis em tablet & PWA implementada; autenticação individual pendente \\
-    MQTT e bancada & Comandos idempotentes, TTL local e ciclos físicos repetidos & Firmware parcial; integração e bancada pendentes \\
+    MQTT e bancada & Comandos idempotentes, TTL local e ciclos físicos repetidos & Adaptador, firmware, planta visual e workspace implementados; ensaio integrado pendente \\
     SENATRAN homologada & Caso de uso aprovado, contratos e certificados fora do repositório & Autorização pendente \\
     \bottomrule
   \end{tabularx}
@@ -60,21 +72,24 @@ chamada externa.
 \end{table}
 \endgroup
 
-Na verificação local desta versão, \texttt{pytest} executou 82 testes do backend,
-todos aprovados, com 93\% de cobertura de instruções. Na PWA, os 12 testes
+Na verificação local desta versão, \texttt{pytest} executou 95 testes do backend,
+todos aprovados, com 90\% de cobertura de instruções. Na PWA, os 24 testes
 automatizados foram aprovados e a compilação de produção terminou sem erro. A
 lógica C++ portátil de intertravamento também compilou com avisos tratados como
 erro e concluiu seu conjunto de asserções. A compilação PlatformIO para o alvo
-\path{esp32dev} terminou sem erro; a gravação e execução em uma placa, a
-integração entre componentes e os ciclos físicos não foram executados. Esses
+PICSimLab terminou sem erro e o workspace foi carregado como ESP32-DevKitC; a
+gravação e execução em uma placa, a integração via broker e os ciclos físicos
+não foram executados. Esses
 resultados verificam incrementos de software, mas não equivalem à matriz integral
 de aceitação de H1.
 
-\pendente{concluir autenticação individual e RBAC, implementar o gateway MQTT no
-backend, gravar e ensaiar o firmware em hardware aprovado pelo orientador e
+\pendente{concluir autenticação individual e RBAC, ensaiar o gateway MQTT com
+broker e controlador, gravar e ensaiar o firmware em hardware aprovado pelo
+orientador e
 obter autorização externa antes da integração SENATRAN.}
 
 As tecnologias efetivamente usadas nesta etapa são FastAPI/Python, React/PWA,
-SQLite e C++ para ESP32. MQTT está implementado apenas no lado experimental do
-firmware. PostgreSQL e Docker permanecem possibilidades futuras. Qualquer ajuste
+SQLite, MQTT/Mosquitto local, PICSimLab e C++ para ESP32. MQTT está implementado
+nos dois extremos, mas ainda não foi verificado em execução ponta a ponta.
+PostgreSQL permanece uma possibilidade futura. Qualquer ajuste
 deverá preservar interfaces, estados seguros e testes de aceitação.

@@ -1,30 +1,50 @@
 # Seminário de Andamento
 
-Apresentação modular de 12 lâminas para o Seminário de Andamento do TCC. O conteúdo separa resultados já observados, projeções e atividades ainda pendentes. Não há nome de orientador, data oficial, valores financeiros inventados ou alegação de teste físico.
+Apresentações editáveis do Seminário de Andamento do TCC. O conteúdo distingue
+resultados observados, projeções e atividades pendentes. Não há nome de
+orientador, data oficial, valores financeiros inventados ou alegação de teste
+físico.
 
 ## Arquivos
 
-- `seminario-andamento.pptx`: apresentação final editável.
-- `build-deck.mjs`: fonte em JavaScript ES modules, construída com `@oai/artifact-tool` e a linguagem visual Codex Grid.
+- `seminario-andamento.pptx`: versão modular completa, com 12 lâminas.
+- `seminario-andamento-entrega.pptx`: versão focada nos seis conteúdos exigidos,
+  com 10 lâminas.
+- `seminario-entrega-frame-map.json`: mapa reproduzível das lâminas reutilizadas
+  da apresentação modular.
+- `build-deck.mjs`: fonte da versão modular, construída com
+  `@oai/artifact-tool` e a linguagem visual Codex Grid.
 
-## Reconstrução
+A versão de entrega preserva as lâminas 1 a 8, 11 e 12 da versão modular. Foram
+omitidas as lâminas de resultados parciais de software e análise econômica
+detalhada porque não integram o recorte mínimo informado para esta entrega.
 
-O runtime `@oai/artifact-tool` é fornecido pelo ambiente Codex. Para preparar o vínculo local e reconstruir o arquivo:
+## Reconstrução da versão modular
+
+Com `@oai/artifact-tool` disponível no runtime, execute a partir da raiz do
+repositório:
 
 ```powershell
-node "C:\Users\confi\.codex\plugins\cache\openai-primary-runtime\presentations\26.727.11326\skills\presentations\container_tools\setup_artifact_tool_workspace.mjs" --workspace "C:\Users\confi\OneDrive - GBI COMBUSTIVEIS LTDA\Documentos\TCC\presentation"
-node "C:\Users\confi\OneDrive - GBI COMBUSTIVEIS LTDA\Documentos\TCC\presentation\build-deck.mjs"
+node ./presentation/build-deck.mjs
 ```
+
+O arquivo `seminario-entrega-frame-map.json` registra como derivar a versão de
+entrega sem rediagramar ou reescrever o conteúdo.
 
 ## Validação
 
-O PPTX deve ser renderizado integralmente e verificado com os utilitários da skill Presentations:
+Renderize as lâminas e confira as margens. Se o runtime oferecer os utilitários
+`render_slides.py` e `slides_test.py`, aponte ambos para o PPTX de entrega:
 
 ```powershell
-& "C:\Users\confi\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" "C:\Users\confi\.codex\plugins\cache\openai-primary-runtime\presentations\26.727.11326\skills\presentations\container_tools\render_slides.py" "C:\Users\confi\OneDrive - GBI COMBUSTIVEIS LTDA\Documentos\TCC\presentation\seminario-andamento.pptx"
-& "C:\Users\confi\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" "C:\Users\confi\.codex\plugins\cache\openai-primary-runtime\presentations\26.727.11326\skills\presentations\container_tools\slides_test.py" "C:\Users\confi\OneDrive - GBI COMBUSTIVEIS LTDA\Documentos\TCC\presentation\seminario-andamento.pptx"
+python /caminho/dos/utilitarios/render_slides.py ./presentation/seminario-andamento-entrega.pptx
+python /caminho/dos/utilitarios/slides_test.py ./presentation/seminario-andamento-entrega.pptx
 ```
 
-Cada lâmina contém notas do apresentador com um bloco `[Sources]` para rastreabilidade de afirmações não triviais.
+Cada lâmina possui notas do apresentador e um bloco `[Sources]` para a
+rastreabilidade das afirmações não triviais.
 
-O relatório da última verificação está em `qa-report.txt`. No runtime Windows atual, o processo Node pode encerrar depois de produzir corretamente os PNGs; nesse caso, o teste de margens é concluído aplicando `slides_test.inspect_images` aos 12 renders do deck ampliado, exatamente com os mesmos parâmetros do utilitário.
+No runtime Windows atual, a ferramenta de renderização pode encerrar com código
+diferente de zero depois de produzir corretamente todos os PNGs. Nesse caso, a
+verificação é concluída aplicando `slides_test.inspect_images` aos renders do
+deck ampliado, com os mesmos parâmetros do utilitário.

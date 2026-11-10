@@ -70,4 +70,20 @@ outputs/
 *.inspect.ndjson
 presentation/.tmp-artifact/
 presentation/seminario-andamento/
+presentation/seminario-andamento-current/
+presentation/seminario-andamento-entrega/
 presentation/*-montage.png
+prototype/picsimlab/*.pzw
+
+# Artefatos locais e documentos corporativos fora do repositório acadêmico
+/docs/credencia-politica-termos.html
+/docs/superpowers/plans/
+/research/compliance/caso-de-uso-credencia-senatran-gbi.md
+/output/*
+!/output/pdf/
+!/output/word/
+/output/pdf/*
+!/output/pdf/seminario-andamento.pdf
+/output/word/*
+!/output/word/seminario-andamento-editavel.docx
+!/output/word/tcc-sprint-1-problema-objetivos-requisitos.docx

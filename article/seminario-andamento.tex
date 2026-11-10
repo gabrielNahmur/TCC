@@ -1,0 +1,114 @@
+\documentclass[12pt]{article}
+
+% Documento específico para a entrega do Seminário de Andamento.
+% As seções acadêmicas são compartilhadas com o artigo completo para evitar
+% divergência de conteúdo entre as duas versões.
+\usepackage{sbc-template}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{xurl}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage[hidelinks]{hyperref}
+
+\input{metadados}
+
+\hypersetup{
+  pdftitle={Seminário de Andamento: \TituloTCC},
+  pdfauthor={\AutorTCC},
+  pdfsubject={Seminário de Andamento - recorte acadêmico para entrega},
+  pdfkeywords={abastecimento incompatível; intertravamento; consulta veicular; Design Science Research; análise e projeto de software}
+}
+
+\addto\captionsbrazil{\renewcommand{\refname}{Referências}}
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist[itemize]{leftmargin=1.27cm}
+\setlist[enumerate]{leftmargin=1.27cm}
+\emergencystretch=2em
+
+\newcommand{\pendente}[1]{\textcolor{red!65!black}{\textbf{[PENDENTE: #1]}}}
+\newcommand{\naorealizado}{\textit{Não realizado até esta versão do seminário.}}
+\newcommand{\fontepropria}{Fonte: elaborado pelo autor (2026).}
+
+\title{Seminário de Andamento\\[0.35em]\large \TituloTCC}
+\author{\AutorTCC}
+\address{\InstituicaoTCC\\
+  \CampusTCC\\
+  \CursoTCC\\
+  Orientação: \OrientadorTCC\\
+  \CidadeDataTCC
+  \email{\EmailAutor}
+}
+
+\begin{document}
+\raggedbottom
+
+\maketitle
+
+\begin{center}
+\fcolorbox{black!55}{black!3}{%
+  \parbox{0.88\textwidth}{\small\textbf{Documento parcial para o Seminário de Andamento.}
+  Esta versão contém somente contextualização e objetivos, fundamentação
+  teórica, revisão de literatura, metodologia parcial, documentos de análise e
+  projeto do software e cronograma. Campos em vermelho permanecem pendentes de
+  confirmação formal.}}
+\end{center}
+
+\begin{resumo}
+O abastecimento de um veículo com combustível incompatível pode gerar
+transtornos operacionais, custos de reparação e impacto no atendimento ao
+cliente. Este trabalho propõe um protótipo seguro de bancada que combina
+consulta de dados veiculares, política de compatibilidade e intertravamento
+físico independente no suporte dos bicos. O artefato não comanda bombeamento
+nem modifica a automação da empresa. A pesquisa adota \textit{Design Science
+Research}, revisão de literatura e estudo de caso em uma rede de postos
+anonimizada. Esta versão de andamento apresenta a contextualização, os
+objetivos, a fundamentação, o protocolo da revisão, a metodologia parcial, os
+requisitos, a arquitetura, a modelagem e o cronograma. Dados históricos,
+entrevistas e ensaios físicos dependem de autorizações e etapas posteriores;
+portanto, nenhuma hipótese é considerada concluída neste documento.
+
+\par\smallskip\noindent\textbf{Palavras-chave:} Abastecimento incompatível,
+Intertravamento, Consulta veicular, Análise e projeto de software, Design
+Science Research.
+\end{resumo}
+
+% (1) Contextualização e (2) definição de objetivos.
+\input{sections/01-introducao}
+
+% (3) Referencial teórico.
+\input{sections/02-fundamentacao}
+
+% (4) Revisão de literatura.
+\input{sections/03-revisao-literatura}
+
+% (5) Metodologia parcial e documentos de análise/projeto do software.
+\input{sections/04-metodologia}
+\input{sections/05-requisitos}
+\input{sections/06-arquitetura}
+\input{sections/07-modelagem}
+
+% (6) Cronograma com estimativa de término.
+\input{sections/11-cronograma}
+
+\begingroup
+\footnotesize
+\bibliographystyle{sbc}
+\bibliography{referencias}
+\endgroup
+
+\end{document}
